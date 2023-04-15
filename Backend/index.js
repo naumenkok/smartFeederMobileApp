@@ -1,4 +1,5 @@
 const express = require('express');
+const sqlite3 = require('sqlite3');
 const app = express();
 const PORT = 8080;
 const SIM_PORT = 8888;
@@ -13,6 +14,13 @@ var waterLevel = 0;
 var waterLowLimit = 20;
 var waterHighLimit = 80;
 var lastSetFoodLevel = 0;
+
+var db = new sqlite3.Database('./plans.db', sqlite3.OPEN_READWRITE, (err) => {
+    if (err) return console.error(err.message);
+    console.log("database connected")
+});
+
+// db.run(`CREATE TABLE current_plan(id integer primary key, time text, amount integer)`);
 
 
 app.listen(
