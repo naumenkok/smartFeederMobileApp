@@ -7,9 +7,7 @@ Wymagania:
 
 Przygotowanie:
 W folderze 'Backend' wpisac: 
- - npm install express
- - npm install axios
- - npm install sqlite3
+ - npm install
 
 Odpalanie:
-Komenda: node .\index.js
+ - npm start

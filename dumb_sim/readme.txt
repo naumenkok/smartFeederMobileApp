@@ -6,8 +6,8 @@ Wymagania:
 - zainstlowany Node.js na maszynie
 
 Przygotowanie:
-W folderze 'Dumb_sim' wpisac: 
- - npm install express
+W folderze 'Backend' wpisac: 
+ - npm install
 
 Odpalanie:
-Komenda: node .\index.js
+ - npm start
