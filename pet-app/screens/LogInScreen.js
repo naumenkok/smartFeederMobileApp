@@ -1,8 +1,6 @@
 import React from 'react';
-import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
-import { StackActions } from '@react-navigation/native';
+import { ImageBackground, View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import InputField from '../components/InputField';
-import SignUp from './SignUpScreen';
 
 export default function  LogIn ({ navigation }) {
     return(
@@ -10,7 +8,7 @@ export default function  LogIn ({ navigation }) {
         <View style={styles.topContainer} />
             <View style={styles.container1}>
                     <Text style={styles.text1}>log in</Text>
-                    <Text style={styles.text2}>|  </Text>
+                    <Text style={styles.text2}>|   </Text>
                     <TouchableOpacity 
                             onPress={() => navigation.navigate('SignUpScreen')}>
                         <Text style={styles.text3}>sign up</Text>
@@ -28,7 +26,7 @@ export default function  LogIn ({ navigation }) {
             </View> 
             <View style={styles.container4}>
                 <TouchableOpacity 
-                        onPress={() => navigation.navigate('SignUpScreen')}
+                        onPress={() => navigation.navigate('LogoScreen')}
                         style={styles.button}>
                     <Text style={styles.buttonText1}>log in</Text>
                 </TouchableOpacity>

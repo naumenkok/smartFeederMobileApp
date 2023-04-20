@@ -3,8 +3,6 @@ import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Button, Imag
 import { useState } from 'react';
 import { AppLoading } from 'expo';
 import { useFonts } from 'expo-font';
-import LogIn from './LogInScreen';
-import SignUp from './SignUpScreen';
 
 export default function MainScreen ({ navigation }) {
   // let [fontsLoaded] = useFonts({
@@ -79,14 +77,14 @@ const styles = StyleSheet.create({
         height: 60,
         justifyContent: 'space-between',
         alignItems: 'center',
-        bottom: -10,
+        bottom: -50,
         margin: 25,
         borderWidth: 5,
         borderColor: "white",
         borderRadius: 22,
       },
       buttonText1: {
-        left:25,
+        left:40,
         fontSize: 22,
         fontWeight: 'bold',
         color: "white",
@@ -101,7 +99,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "flex-end",
-        paddingBottom: "5%",
+        paddingBottom: "15%",
       },
       text2: {
         fontSize: 22,
