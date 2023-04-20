@@ -15,23 +15,9 @@ export default function HomeScreen ({ navigation }) {
             <View style={[styles.container, styles.container2]}>
                     
             </View>
-            {/* <View style={[styles.container, styles.container3]}>
-                <BottomTab navigation={navigation} screenType={'HomeScreen'}></BottomTab>
-            </View> */}
             <View style={[styles.container, styles.container3]}>
-                <Image source={require('./../img/HomeMain.png')} style={styles.image3}/>
-                <TouchableOpacity 
-                            onPress={() => navigation.navigate('MessegeScreen')}
-                            style={styles.button}>
-                            <Image source={require('./../img/Messege.png')} style={styles.image}/>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                            onPress={() => navigation.navigate('UserScreen')}
-                            style={styles.button}>
-                            <Image source={require('./../img/User.png')} style={styles.image2}/>
-                </TouchableOpacity>
+                <BottomTab navigation={navigation} screenType={'HomeScreen'}></BottomTab>
             </View>
-       
     </ImageBackground>
   );
 }
@@ -60,25 +46,10 @@ const styles = StyleSheet.create({
         paddingVertical: '60%',
         marginBottom: '10%',
         marginTop: '5%',
-
     },
     container3: {
         padding: '8%',
         marginVertical: '10%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
     },
-    image: {
-        bottom: 15,
-        right: 25,
-    },
-    image2:{
-        bottom: 15,
-        right: 5,
-    },
-    image3:{
-        bottom: 60,
-        right: 20,
-    }
   });
   

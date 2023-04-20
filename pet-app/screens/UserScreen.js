@@ -2,6 +2,7 @@ import React from 'react';
 import { useRef, useEffect } from 'react';
 import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Button, Image, Alert } from 'react-native';
 import { Animated } from 'react-native';
+import BottomTab from '../components/BottomTab';
 
 export default function UserScreen ({ navigation }) {
     const animation = useRef(new Animated.Value(0)).current;
@@ -9,7 +10,7 @@ export default function UserScreen ({ navigation }) {
     useEffect(() => {
         Animated.timing(animation, {
             toValue: 4,
-            duration: 250,
+            duration: 375,
             useNativeDriver: true
         }).start();
     }, []);
@@ -29,6 +30,10 @@ export default function UserScreen ({ navigation }) {
                     
             </View>
             <View style={[styles.container, styles.container3]}>
+                <BottomTab navigation={navigation} screenType={'UserScreen'}></BottomTab>
+            </View>
+            
+            {/* <View style={[styles.container, styles.container3]}>
                 <TouchableOpacity 
                             onPress={() => navigation.navigate('HomeScreen')}
                             style={styles.button}>
@@ -39,20 +44,17 @@ export default function UserScreen ({ navigation }) {
                             style={styles.button}>
                             <Image source={require('./../img/Messege.png')} style={styles.image}/>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {
-                                    Animated.timing(animation, {
-                                        toValue: 0,
-                                        duration: 1000,
-                                        useNativeDriver: true
-                                    }).start();
-                                }}>
-                                    <Animated.Image
-                                        style={[styles.image3, { transform: [{ rotate: interpolatedRotateAnimation }] }]}
-                                        source={require('./../img/UserMain.png')}
-                                    />
-                </TouchableOpacity>
-                {/* <Image source={require('./../img/UserMain.png')} style={[styles.image3, { transform: [{ rotate: interpolatedRotateAnimation }] }]}/> */}
-            </View>
+                                    <TouchableOpacity onPress={() => {
+                                                        useEffect.start();
+                                                    }}>
+                                                        <Image source={require('./../img/Messege.png')} style={{bottom: 60}}/>
+                                                        <Animated.Image
+                                                            style={[{bottom: 60}, { transform: [{ rotate: interpolatedRotateAnimation }] }]}
+                                                            source={require('./../img/UserMain.png')}
+                                                        />
+                                    </TouchableOpacity>
+                <Image source={require('./../img/UserMain.png')} style={styles.image3}/>
+            </View> */}
        
     </ImageBackground>
   );
@@ -87,20 +89,6 @@ const styles = StyleSheet.create({
     container3: {
         padding: '8%',
         marginVertical: '10%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
     },
-    image: {
-        bottom: 15,
-        left: 25,
-    },
-    image2:{
-        bottom: 20,
-        left: 5,
-    },
-    image3:{
-        bottom: 60,
-        left: 20,
-    }
   });
   

@@ -39,17 +39,17 @@ const AppNavigator = () => {
         <Stack.Screen
           name="HomeScreen"
           component={HomeScreen}
-          options={{headerShown: false}}
+          options={{headerShown: "HomeScreen"}}
         />
         <Stack.Screen
           name="MessegeScreen"
           component={MessegeScreen}
-          options={{headerShown: false}}
+          options={{headerShown: "MessegeScreen"}}
         />
         <Stack.Screen
           name="UserScreen"
           component={UserScreen}
-          options={{headerShown: false}}
+          options={{headerShown: "UserScreen"}}
         />
       </Stack.Navigator>
     </NavigationContainer>
