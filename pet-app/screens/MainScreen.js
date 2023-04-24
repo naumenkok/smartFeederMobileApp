@@ -3,29 +3,15 @@ import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Button, Imag
 import { useState } from 'react';
 import { AppLoading } from 'expo';
 import { useFonts } from 'expo-font';
+import * as Font from 'expo-font';
 
 export default function MainScreen ({ navigation }) {
-  // let [fontsLoaded] = useFonts({
-  //   'AlBayan': require('./../assets/fonts/AlBayan.ttf'),
-  // })
-  // const [dataLoaded, setDataLoaded] = useState(false);
-
-  // if (!fontsLoaded) {
-  //   return (
-  //     <AppLoading/>
-  //   );
-  // }
-
-
-//   function myTouch(){
-//     navigation.navigate('LogIn');
-//  }
 
   return (
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
         <View style={styles.container}>
             <View style={styles.textContainer1}>
-                <Text style={styles.text} > SMART {'\n'}FEDEER</Text>
+                <Text style={styles.text} > SMART {'\n'}FEEDER</Text>
             </View>
         </View>
 
@@ -70,7 +56,7 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize:36,
         fontWeight: 'bold',
-        // fontFamily: 'AlBayan',
+       // fontFamily: CustomFont,
       },
       button: {
         flexDirection: 'row',

@@ -29,5 +29,22 @@
   "devDependencies": {
     "@babel/core": "^7.20.0"
   },
-  "private": true
+  "private": true,
+  "rnpm": {
+    "assets": [
+      "./assets/fonts/"
+    ]
+  },
+  "fonts": [
+    {
+      "family": "AlBayan",
+      "fonts": [
+        {
+          "src": "./assets/fonts/AlBayan.ttf",
+          "fontWeight": "normal",
+          "fontStyle": "normal"
+        }
+      ]
+    }
+  ]
 }
