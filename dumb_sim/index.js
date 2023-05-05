@@ -9,6 +9,7 @@ checkFoodOpen = false;
 checkWaterOpen = false;
 foodLevel = 100;
 waterLevel = 100;
+batteryLevel = 100;
 
 app.listen(
     PORT,
@@ -20,11 +21,12 @@ app.get('/', (req,res) => {
 });
 
 app.get('/getSimStatus', (req,res) => {
-    res.status(200).send({
-        food: String(foodLevel),
-        water: String(waterLevel),
+    res.status(200).json({
+        food: foodLevel,
+        water: waterLevel,
         foodOpen: String(checkFoodOpen),
-        waterOpen: String(checkWaterOpen)
+        waterOpen: String(checkWaterOpen),
+        battery: batteryLevel
     });
 });
 
