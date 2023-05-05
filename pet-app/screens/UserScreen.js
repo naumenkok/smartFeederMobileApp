@@ -1,23 +1,31 @@
 import React from 'react';
-import { useRef, useEffect } from 'react';
-import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Button, Image, Alert } from 'react-native';
+import { useRef, useEffect, useState } from 'react';
+import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Modal, Image, Alert } from 'react-native';
 import { Animated } from 'react-native';
 import BottomTab from '../components/BottomTab';
-import { useState } from 'react';
 import { AppLoading } from 'expo';
 import { useFonts } from 'expo-font';
 import * as Font from 'expo-font';
+import ModalWindow from '../components/ModalWindow';
+
 
 
 export default function UserScreen ({ navigation }) {
-  return (
+    const [isModalVisible, setModalVisible] = useState(false);
+    
+    const closeModal = () => {
+        setModalVisible(false);
+    }
+
+
+    return (
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
-       
+       <ModalWindow visible={isModalVisible} onClose={() => setModalVisible(false)} />
         <View style={[styles.container, styles.container1]}>
-            <Image source={require('./../img/Avatar.png')} style={styles.user}/>
-            <Text style={[styles.text, styles.text]} >Hi Ala Makota!</Text>
+            <Image source={require('./../img/Avatar2.png')} style={[styles.user]}/>
+            <Text style={styles.text} >Hi Ala Makota!</Text>
         </View>
-        <View style={[styles.container, styles.container2]}>
+        <View style={[styles.container, styles.container2, styles.shadowProp]}>
             <TouchableOpacity 
                     onPress={() => navigation.navigate('SignUpScreen')}>
                 <Text style={[styles.text, styles.text1]} >CHANGE YOUR PROFILE</Text>
@@ -29,7 +37,7 @@ export default function UserScreen ({ navigation }) {
             </TouchableOpacity>
             <Image source={require('./../img/Line2.png')} style={styles.arrow} />
             <TouchableOpacity 
-                    onPress={() => navigation.navigate('SignUpScreen')}>
+                    onPress={() => setModalVisible(true)}>
                 <Text style={[styles.text, styles.text3]} >FOOD SETTINGS</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line1.png')} style={styles.arrow} />
@@ -37,12 +45,27 @@ export default function UserScreen ({ navigation }) {
                     onPress={() => navigation.navigate('SignUpScreen')}>
                 <Text style={[styles.text, styles.text4]} >VIEW RECOMENDATION</Text>
             </TouchableOpacity>
+
+            
+            {/* <Modal visible={isModalVisible} animationType='slide'>
+                <View style={styles.modalContainer}>
+                    <Text style={styles.modalText}>This is a modal window</Text>
+                    <TouchableOpacity onPress={closeModal}>
+                        <Text style={styles.modalCloseText}>Close</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modal> */}
+
         </View>
-        <View style={[styles.container, styles.container3]}>
+
+        
+        <View style={[styles.container, styles.container3, styles.shadowProp]}>
             <BottomTab navigation={navigation} screenType={'UserScreen'}></BottomTab>
         </View>
-    
+        
+
     </ImageBackground>
+    
   );
 }
 
@@ -106,11 +129,18 @@ const styles = StyleSheet.create({
     arrow: {
         left: 120,
         height: 5,
-        width: 130,
+        width: 160,
     },
     user: {
         height: 145,
         width: 145,
     },
+    shadowProp: {  
+        shadowColor: 'rgb(86, 41, 246)',
+        shadowOpacity: 0.5,
+        shadowOffset: { width: 0, height: 2},
+        shadowRadius: 10,
+        elevation: 10,
+      },  
   });
   

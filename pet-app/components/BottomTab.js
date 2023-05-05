@@ -21,24 +21,24 @@ export default function BottomTab({navigation, screenType}) {
             onPress={() => navigation.navigate('HomeScreen')}
             style={styles.button}>
             <Image source={imgHomeSource} style={[
-                screenType === 'HomeScreen' && { bottom: 60, right: 20, },
-                screenType === 'MessegeScreen' && { bottom: 20, },
+                screenType === 'HomeScreen' && { bottom: 30, left: 10, },
+                screenType === 'MessegeScreen' && { bottom: -10, left: 35, },
                 screenType === 'UserScreen' && { bottom: -10, left: 30, }]} />
         </TouchableOpacity>
         <TouchableOpacity
             onPress={() => navigation.navigate('MessegeScreen')}
             style={styles.button}>
             <Image source={imgMessegeSource} style={[
-                screenType === 'HomeScreen' && { bottom: 15,right: 30, },
-                screenType === 'MessegeScreen' && { bottom: 60, right: 5, },
+                screenType === 'HomeScreen' && { bottom: -12,right: 35, },
+                screenType === 'MessegeScreen' && { bottom: 30, },
                 screenType === 'UserScreen' && { bottom: -15, left: 25,}]} />
         </TouchableOpacity>
         <TouchableOpacity
             onPress={() => navigation.navigate('UserScreen')}
             style={styles.button}>
             <Image source={imgUserSource} style={[
-                screenType === 'HomeScreen' && { bottom: 15,right: 5, },
-                screenType === 'MessegeScreen' && { bottom: 15, },
+                screenType === 'HomeScreen' && { bottom: -12,right: 35, },
+                screenType === 'MessegeScreen' && { bottom: -15, right: 40, },
                 screenType === 'UserScreen' && { bottom: 30, right: 10,}]} />
         </TouchableOpacity>
     </View> 
