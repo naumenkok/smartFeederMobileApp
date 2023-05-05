@@ -208,7 +208,6 @@ async function fillFood(newLevel){
         return
     }
     console.log(`Filling food to: ${newLevel}`)
-    insertFillFood(newLevel, foodLevel);
     lastSetFoodLevel = newLevel;
     intervalFillFood = setInterval(checkFoodFillUpperLimit, 1000);
 }
@@ -268,6 +267,7 @@ function reloadSchedule(){
 
     schedule.scheduleJob(rule, function() {
       insertEatHistory(lastCheckedFoodLevel - foodLevel, time);
+      insertFillFood(amount, foodLevel, time);
       lastCheckedFoodLevel = foodLevel;
       fillFood(amount);
     });
@@ -308,9 +308,9 @@ async function insertEatHistory(amount, time){
   });
 }
 
-async function insertFillFood(newLevel, curFoodLevel){
+async function insertFillFood(newLevel, curFoodLevel, time){
   const date = new Date().toISOString().split('T')[0];
-  const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+  // const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
   
   db.run(`INSERT INTO fillHistory(levelWhenStarted, setLevel, time, date) VALUES (?, ?, ?, ?)`, curFoodLevel, newLevel, time, date, function(err) {
     if (err) {
