@@ -1,7 +1,8 @@
 import React from 'react';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { View, ImageBackground, Modal, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import {View, ImageBackground, Modal, StyleSheet, TouchableOpacity, Text, TextInput} from 'react-native';
+import Constants from 'expo-constants';
 
 export default function ModalWindow({ visible, onClose }) {
 
@@ -9,9 +10,9 @@ export default function ModalWindow({ visible, onClose }) {
   
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/getAmountInDate', 
-        {
-            "date":"2023-04-23"
+        const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
+        const response = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
+            params: {date: "2023-05-05"}
         });
         setData(response.data);
       } catch (error) {
@@ -28,14 +29,19 @@ export default function ModalWindow({ visible, onClose }) {
   return (
     <Modal visible={visible} animationType='slide'>
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
-      <View style={[styles.modalContent,styles.shadowProp]}>
-        <Text style={styles.modalText}>This is a modal window</Text>
-        <Text style={[styles.modalText]}>Food:</Text>
-        <Text style={[styles.modalText]}>{data.message}</Text>
-        <TouchableOpacity onPress={onClose}>
-          <Text style={styles.modalCloseText}>Close</Text>
-        </TouchableOpacity>
-         </View>
+        <View style={[styles.container, styles.shadowProp]}>
+            <Text style={[styles.text, styles.text1]}>Change diet:</Text>
+            <TextInput style={styles.input}
+                placeholder="Time"
+            />
+            <TextInput
+                placeholder="Time"
+            />
+
+            <TouchableOpacity onPress={onClose}>
+                <Text style={[styles.text, styles.text3]}>Close</Text>
+            </TouchableOpacity>
+        </View>
     </ImageBackground>
     </Modal>
   );
@@ -48,38 +54,44 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
       },
-      modalContent: {
-        backgroundColor: '#fff',
+    container: {
         padding: 20,
-        borderRadius: 22,
-        backgroundColor: 'white',
-        flexDirection: 'column',
-        // justifyContent: 'space-evenly',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        // justifyContent: 'center',
         width: '80%',
-        height: '40%',
-      },
-      modalText: {
-        fontSize: 20,
+        height: '50%',
+        backgroundColor: 'white',
+        marginHorizontal: '3%',
+        borderRadius: 22,
+        marginBottom: '5%',
+        marginTop: '5%',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        alignItems: 'stretch',
+    },
+    text: {
         fontWeight: 'bold',
-        color: "white",
-        textTransform: 'uppercase',
         textAlign: 'center',
-        color: 'rgb(250, 123, 205)',
-      },
-      modalCloseText: {
-        color: 'blue',
+    },
+    text1: {
+        fontSize: 24,
+        color: 'rgb(126, 94, 240)',
+    },
+    text2: {
+        fontSize: 20,
+        color: 'rgb(101, 152, 236)',
+        paddingTop: 3,
+    },
+    text3: {
         fontSize: 16,
-
-      },
-      shadowProp: {  
-          shadowColor: 'rgb(86, 41, 246)',
-          shadowOpacity: 0.5,
-          shadowOffset: { width: 0, height: 2},
-          shadowRadius: 10,
-          elevation: 10,
-        }, 
+        color: 'blue',
+    },
+    shadowProp: {
+        shadowColor: 'rgb(86, 41, 246)',
+        shadowOpacity: 0.5,
+        shadowOffset: { width: 0, height: 2},
+        shadowRadius: 10,
+        elevation: 10,
+    },
+    input:{
+    }
   });
   

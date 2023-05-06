@@ -7,7 +7,7 @@ import SignUpScreen from '../screens/SignUpScreen';
 import MainScreen from '../screens/MainScreen';
 import LogoScreen from '../screens/LogoScreen';
 import HomeScreen from '../screens/HomeScreen';
-import MessegeScreen from '../screens/MessegeScreen';
+import MessageScreen from '../screens/MessageScreen';
 import UserScreen from '../screens/UserScreen';
 
 const Stack = createNativeStackNavigator();
@@ -42,8 +42,8 @@ const AppNavigator = () => {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="MessegeScreen"
-          component={MessegeScreen}
+          name="MessageScreen"
+          component={MessageScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen

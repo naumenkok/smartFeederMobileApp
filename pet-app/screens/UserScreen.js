@@ -7,63 +7,58 @@ import { AppLoading } from 'expo';
 import { useFonts } from 'expo-font';
 import * as Font from 'expo-font';
 import ModalWindow from '../components/ModalWindow';
+import SettingsWindow from '../components/SettingsWindow';
 
 
 
 export default function UserScreen ({ navigation }) {
     const [isModalVisible, setModalVisible] = useState(false);
+    const [isSettingsVisible, setSettingsVisible] = useState(false);
     
     const closeModal = () => {
         setModalVisible(false);
     }
 
+    const closeSettings = () => {
+        setSettingsVisible(false);
+    }
+
 
     return (
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
-       <ModalWindow visible={isModalVisible} onClose={() => setModalVisible(false)} />
+        <ModalWindow visible={isModalVisible} onClose={() => setModalVisible(false)} />
+        <SettingsWindow visible={isSettingsVisible} onClose={() => setSettingsVisible(false)} />
+
         <View style={[styles.container, styles.container1]}>
             <Image source={require('./../img/Avatar2.png')} style={[styles.user]}/>
             <Text style={styles.text} >Hi Ala Makota!</Text>
         </View>
+
         <View style={[styles.container, styles.container2, styles.shadowProp]}>
             <TouchableOpacity 
-                    onPress={() => navigation.navigate('SignUpScreen')}>
-                <Text style={[styles.text, styles.text1]} >CHANGE YOUR PROFILE</Text>
+                    onPress={() => navigation.navigate('HomeScreen')}>
+                <Text style={[styles.text, styles.text1]} >VIEW HISTORY</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line3.png')} style={styles.arrow} />
-            <TouchableOpacity 
-                    onPress={() => navigation.navigate('SignUpScreen')}>
-                <Text style={[styles.text, styles.text2]} >VIEW HISTORY</Text>
+            <TouchableOpacity
+                onPress={() => setSettingsVisible(true)}>
+                <Text style={[styles.text, styles.text2]} >VIEW FOOD SETTINGS</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line2.png')} style={styles.arrow} />
             <TouchableOpacity 
                     onPress={() => setModalVisible(true)}>
-                <Text style={[styles.text, styles.text3]} >FOOD SETTINGS</Text>
+                <Text style={[styles.text, styles.text3]} >change FOOD SETTINGS</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line1.png')} style={styles.arrow} />
             <TouchableOpacity 
                     onPress={() => navigation.navigate('SignUpScreen')}>
                 <Text style={[styles.text, styles.text4]} >VIEW RECOMENDATION</Text>
             </TouchableOpacity>
-
-            
-            {/* <Modal visible={isModalVisible} animationType='slide'>
-                <View style={styles.modalContainer}>
-                    <Text style={styles.modalText}>This is a modal window</Text>
-                    <TouchableOpacity onPress={closeModal}>
-                        <Text style={styles.modalCloseText}>Close</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modal> */}
-
         </View>
 
-        
         <View style={[styles.container, styles.container3, styles.shadowProp]}>
             <BottomTab navigation={navigation} screenType={'UserScreen'}></BottomTab>
         </View>
-        
-
     </ImageBackground>
     
   );
@@ -87,7 +82,6 @@ const styles = StyleSheet.create({
         flex: 30,
         marginBottom: '2%',
         marginTop: '20%',
-        justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
         justifyContent: 'space-around',
