@@ -3,7 +3,6 @@ const sqlite3 = require('sqlite3');
 const schedule = require('node-schedule');
 const app = express();
 const PORT = 8080;
-const SIM_PORT = 8888;
 const path = require('path');
 const axios = require('axios');
 const { start } = require('repl');
@@ -13,16 +12,19 @@ var checkFoodOpen = false;
 var checkWaterOpen = false;
 var foodLevel = 0;
 var waterLevel = 0;
-var waterLowLimit = 20;
-var waterHighLimit = 80;
+var containerWaterLevel = 2000;
+var containerFoodLevel = 2000;
+var waterLowLimit = 100;
+var waterHighLimit = 400;
 var lastCheckedFoodLevel = 0;
 var batteryLevel = 100;
+var checkCharging = true;
 var lastSetFoodLevel;
 var currentDiet;
 // Poziomy których nie można nigdy przekroczyć (user powinien mieć blokade ustawiania jedzenia ponad ten poziom)
 // aktualne 200 to tylko placeholdery
-const waterDangerLimit = 200;
-const foodDangerLimit = 200;
+const waterDangerLimit = 500;
+const foodDangerLimit = 500;
 
 var db = new sqlite3.Database('./karmnik.db', sqlite3.OPEN_READWRITE, (err) => {
     if (err) return console.error(err.message);
@@ -51,9 +53,12 @@ app.get('/getSimStatus', (req,res) => {
     res.status(200).json({
         food: foodLevel,
         water: waterLevel,
-        foodOpen: String(checkFoodOpen),
-        waterOpen: String(checkWaterOpen),
-        battery: batteryLevel
+        containerFood: containerFoodLevel,
+        containerWater: containerWaterLevel,
+        foodOpen: checkFoodOpen,
+        waterOpen: checkWaterOpen,
+        battery: batteryLevel,
+        charging: checkCharging
     });
 });
 
@@ -90,6 +95,7 @@ app.get('/forceReloadSchedule', (req,res) => {
   res.status(200).send();
 });
 
+// te posty 5 to bardziej do debugu starego, aktualnie nie uzywane bo karmnik ma sam pilnowac sobie kiedy otwierac/zamykac
 app.post('/openFood', (req, res) => {
     openFood();
     res.status(200).send();
@@ -116,13 +122,119 @@ app.post('/newFoodLevel', (req, res) => {
     res.status(200).send();
 });
 
+app.post('/addContainerFood', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  containerFoodLevel += amount;
+  res.status(200).send();
+});
+
+app.post('/removeContainerFood', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  containerFoodLevel -= amount;
+  res.status(200).send();
+});
+
+app.post('/addContainerWater', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  containerWaterLevel += amount;
+  res.status(200).send();
+});
+
+app.post('/removeContainerWater', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  containerWaterLevel -= amount;
+  res.status(200).send();
+});
+
+app.post('/addBowlFood', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  foodLevel += amount;
+  res.status(200).send();
+});
+
+app.post('/removeBowlFood', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  foodLevel -= amount;
+  res.status(200).send();
+});
+
+app.post('/addBowlWater', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  waterLevel += amount;
+  res.status(200).send();
+});
+
+app.post('/removeBowlWater', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  waterLevel -= amount;
+  res.status(200).send();
+});
+
+app.get('/getValveStatus', (req, res) => {
+  res.status(200).json({
+    foodOpen: checkFoodOpen,
+    waterOpen: checkWaterOpen
+  });
+});
+
+app.post('/changeChargingStatus', (req, res) => {
+  checkCharging = res.data.charging;
+  res.status(200).send();
+});
+
+app.post('/addBatteryLevel', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  batteryLevel += amount;
+  res.status(200).send();
+});
+
+app.post('/removeBatteryLevel', (req, res) => {
+  var amount = parseInt(req.query.amount);
+  batteryLevel -= amount;
+  res.status(200).send();
+});
+
+app.post('/changeWaterBowlLimit', (req, res) => {
+  const { limitUp, limitDown } = req.query;
+
+  if (!limitUp || !limitDown) {
+    res.status(400).json({ message: 'Both limitUp and limitDown query parameters are required' });
+    return;
+  }
+
+  const parsedLimitUp = parseInt(limitUp);
+  const parsedLimitDown = parseInt(limitDown);
+
+  if (isNaN(parsedLimitUp) || isNaN(parsedLimitDown)) {
+    res.status(400).json({ message: 'Invalid query parameters: limitUp and limitDown must be integers' });
+    return;
+  }
+
+  if (parsedLimitDown > parsedLimitUp){
+    res.status(400).json({message: "Down > Up. Aborted"});
+    return;
+  }
+  
+  if (parsedLimitUp > waterDangerLimit){
+    res.status(400).json({message: "Upper limit over safety barrier. Aborted"});
+    return;
+  }
+  
+  waterHighLimit = parsedLimitUp;
+  waterLowLimit = parsedLimitDown;
+  
+  res.status(200).json({message: "Limits updated"});
+  return;
+});
+
+
 app.get('/getAmountInDate', async (req, res) => {
   const totalAmount = await selectAmountInDate(req.body.date);
   res.status(200).send({ message: totalAmount });
 });
 
 app.get('/getEatHistoryInDate', async (req, res) => {
-  const rows = await selectEatHistoryInDate(req.body.date);
+  const rows = await selectEatHistoryInDate(req.query.date);
   const times = [];
   const amounts = [];
   rows.forEach(function(row) {
@@ -137,7 +249,7 @@ app.get('/getEatHistoryInDate', async (req, res) => {
 });
 
 app.get('/getFillHistoryInDate', async (req, res) => {
-  const rows = await selectFillHistoryInDate(req.body.date);
+  const rows = await selectFillHistoryInDate(req.query.date);
   const levelWhenStarted = [];
   const setLevel = [];
   const time = [];
@@ -154,35 +266,21 @@ app.get('/getFillHistoryInDate', async (req, res) => {
   res.status(200).json(data);
 });
 
-
-
+// #cleancode, funkcje troche malo roziwniete po zmianach ale wywalenie ich by wymagalo refaktoringu
 async function openFood(){
-    const res_sim = axios.post(`http://localhost:${SIM_PORT}/openFood`);
     checkFoodOpen = true;
 }
 
 async function closeFood(){
-    const res_sim = axios.post(`http://localhost:${SIM_PORT}/closeFood`);
     checkFoodOpen = false;
 }
 
 async function openWater(){
-    const res_sim = axios.post(`http://localhost:${SIM_PORT}/openWater`);
     checkWaterOpen = true;
 }
 
 async function closeWater(){
-    const res_sim = axios.post(`http://localhost:${SIM_PORT}/closeWater`);
     checkWaterOpen = false;
-}
-
-async function getSimStatus(){
-    const res = await axios.get(`http://localhost:${SIM_PORT}/getSimStatus`);
-    foodLevel = res.data.food;
-    waterLevel = res.data.water;
-    checkFoodOpen = (res.data.foodOpen === "true");
-    checkWaterOpen = (res.data.waterOpen === "true");
-    batteryLevel = res.data.battery;
 }
 
 async function checkKarmnikHealth(){
@@ -209,7 +307,7 @@ async function fillFood(newLevel){
     }
     console.log(`Filling food to: ${newLevel}`)
     lastSetFoodLevel = newLevel;
-    intervalFillFood = setInterval(checkFoodFillUpperLimit, 1000);
+    intervalFillFood = setInterval(checkFoodFillUpperLimit, 100);
 }
 
 async function keepWater(){
@@ -415,7 +513,6 @@ function clearCurrentDiet() {
 }
 
 // Odpalanie funkcji co dany kwant czasu
-const intervalGetSimStatus = setInterval(getSimStatus, 1000);
 const intervalSafety = setInterval(checkSafety, 1000);
 const intervalKeepWater = setInterval(keepWater, 1000);
 const intervalGetKarmnikHealth = setInterval(checkKarmnikHealth, 60000);

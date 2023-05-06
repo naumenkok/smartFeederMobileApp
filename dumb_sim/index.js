@@ -1,6 +1,7 @@
 const { randomInt } = require('crypto');
 const express = require('express');
 const app = express();
+const BACKEND_PORT = 8080;
 const PORT = 8888;
 const path = require('path');
 app.use(express.json());
@@ -20,35 +21,6 @@ app.get('/', (req,res) => {
     res.status(200).send({message: "ok"});
 });
 
-app.get('/getSimStatus', (req,res) => {
-    res.status(200).json({
-        food: foodLevel,
-        water: waterLevel,
-        foodOpen: String(checkFoodOpen),
-        waterOpen: String(checkWaterOpen),
-        battery: batteryLevel
-    });
-});
-
-app.post('/openFood', (req, res) => {
-    checkFoodOpen = true;
-    res.status(200);
-})
-
-app.post('/closeFood', (req, res) => {
-    checkFoodOpen = false;
-    res.status(200);
-})
-
-app.post('/openWater', (req, res) => {
-    checkWaterOpen = true;
-    res.status(200);
-})
-
-app.post('/closeWater', (req, res) => {
-    checkWaterOpen = false;
-    res.status(200);
-})
 
 async function UpdateSimStatus(){
     foodLevel = foodLevel + (checkFoodOpen ? 5 : -2);
