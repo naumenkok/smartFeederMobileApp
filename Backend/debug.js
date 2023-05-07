@@ -2,6 +2,7 @@ const baseUrl = window.location.origin;
 var temp = "";
 var spanFoodLevel = document.getElementById("spanFoodLevel");
 var spanWaterLevel = document.getElementById("spanWaterLevel");
+var spanBatteryLevel = document.getElementById("spanBatteryLevel");
 var divFoodDoor = document.getElementById("divFoodDoor");
 var divWaterDoor = document.getElementById("divWaterDoor");
 var inputNewLevel = document.getElementById("inputNewLevel");
@@ -90,8 +91,9 @@ async function postNewLevel(newLevel_) {
 
 async function getSimStatus(){
     const res = await (await fetch(baseUrl + "/getSimStatus")).json();
-    spanFoodLevel.textContent = parseInt(res.food);
-    spanWaterLevel.textContent = parseInt(res.water);
+    spanFoodLevel.textContent = res.food;
+    spanWaterLevel.textContent = res.water;
+    spanBatteryLevel.textContent = res.battery;
     if (res.foodOpen === "true"){
         divFoodDoor.style.backgroundColor = "green"
     }
