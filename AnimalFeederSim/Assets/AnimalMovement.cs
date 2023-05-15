@@ -16,7 +16,9 @@ public class AnimalMovement : MonoBehaviour
     private float rightWaterBound;
     private float leftFoodBound;
     private float rightFoodBound;
+
     private Vector3 moveDirection;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +31,7 @@ public class AnimalMovement : MonoBehaviour
         waterLevelInBowlRef = FindObjectOfType<GetWaterLevelInBowl>();
         float randomX = Random.Range(-moveRange, moveRange);
         transform.position = new Vector2(randomX, transform.position.y);
-        
+
         Vector3 foodBowlSize = foodBowlObject.transform.localScale;
         Vector3 foodBowlPosition = foodBowlObject.transform.position;
         leftFoodBound = foodBowlPosition.x - foodBowlSize.x / 2f;
@@ -41,7 +43,7 @@ public class AnimalMovement : MonoBehaviour
         rightWaterBound = waterBowlPosition.x + waterBowlSize.x / 2f;
         animator.SetBool("isEating", false);
         animator.SetBool("isMoving", true);
-        
+
     }
 
     // Update is called once per frame
@@ -57,6 +59,7 @@ public class AnimalMovement : MonoBehaviour
         {
             Flip();
         }
+
         if (foodLevel <= 0)
         {
             float moveDirection = facingRight ? 1 : -1;
@@ -70,38 +73,54 @@ public class AnimalMovement : MonoBehaviour
             if (!isEating)
             {
                 float moveDirectionToBowl = (rightFoodBound - leftFoodBound > 0) ? 1 : -1;
+                if ((moveDirectionToBowl > 0 && !facingRight) || (moveDirectionToBowl < 0 && facingRight))
+                {
+                    Flip();
+                }
                 transform.Translate(moveDirectionToBowl * moveSpeed * Time.deltaTime, 0, 0);
-            }
-            if (transform.position.x >= leftFoodBound && transform.position.x <= rightFoodBound)
-            {
-                isEating = true;
-                StartCoroutine(RemoveFoodOverTime(1f));
-                animator.SetBool("isEating", true);
-                animator.SetBool("isMoving", false);
+                if (transform.position.x >= leftFoodBound && transform.position.x <= rightFoodBound)
+                {
+                    if (!isEating)
+                    {
+                        StartCoroutine(EatFoodOverTime(1f));
+                    }
+                }
             }
         }
-    }
-    void Flip()
-    {
-        facingRight = !facingRight;
-        Vector3 flipped = transform.localScale;
-        flipped.x *= -1;
-        transform.localScale = flipped;
-    }
-    IEnumerator RemoveFoodOverTime(float interval)
-    {
-        while (true)
-        {
-            StartCoroutine(PostEatFood(10));
 
-            yield return new WaitForSeconds(interval);
+        void Flip()
+        {
+            facingRight = !facingRight;
+            Vector3 flipped = transform.localScale;
+            flipped.x *= -1;
+            transform.localScale = flipped;
+
         }
-    }
-    
-    IEnumerator PostEatFood(int amount)
-    {
-        string url = "http://localhost:8080/removeBowlFood?amount=" + amount;
-        UnityWebRequest request = UnityWebRequest.Post(url, "");
-        yield return request.SendWebRequest();
+
+        IEnumerator EatFoodOverTime(float interval)
+        {
+            isEating = true;
+            animator.SetBool("isEating", true);
+            animator.SetBool("isMoving", false);
+
+            while (foodLevelInBowlRef.fillLevel > 0)
+            {
+                StartCoroutine(PostEatFood(10));
+                animator.Play("pig_eat");
+                yield return new WaitForSeconds(interval);
+            }
+
+            isEating = false;
+            animator.SetBool("isEating", false);
+            animator.SetBool("isMoving", true);
+            animator.Play("pig_idle");
+        }
+
+        IEnumerator PostEatFood(int amount)
+        {
+            string url = "http://localhost:8080/removeBowlFood?amount=" + amount;
+            UnityWebRequest request = UnityWebRequest.Post(url, "");
+            yield return request.SendWebRequest();
+        }
     }
 }
