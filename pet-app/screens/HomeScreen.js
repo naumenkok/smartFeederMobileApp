@@ -69,7 +69,7 @@ export default function HomeScreen ({ navigation }) {
                     <Text style={styles.buttonText1}>{getYesterday().getDate()}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={[styles.button, styles[`button${today.getDate() % 5}`], styles.buttoncenter]}>
+                    style={[styles.button, styles[`button${today.getDate() % 5}`], styles.buttoncenter, styles.shadowProp]}>
                     <Text style={styles.buttonText1}>{today.getDate()}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -84,14 +84,13 @@ export default function HomeScreen ({ navigation }) {
                 </TouchableOpacity>
             </View>
             <View style={[styles.container, styles.container2, styles.shadowProp]}>
-                <Image source={require('./../img/Polygon.png')} style={[styles.polygon, styles.shadowProp]}/>
                 {data.times.map((time, index) => (
                     <View  key={index} style={styles.container4}>
                         <Text style={[styles.text, styles.text1, { textAlign: 'center' }]}>
-                            {time}{'        '}
+                            {time}{'    '}
                         </Text>
                         <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
-                            Meal {index}:   {data.amounts[index]}{'        '}
+                            Meal {index}:    {data.amounts[index]}{'        '}
                         </Text>
                         <Image source={require('./../img/Ok.png')} style={[styles.img]}/>
                     </View>
@@ -123,6 +122,7 @@ const styles = StyleSheet.create({
         marginTop: '25%',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center'
     },
     container2: {
         flex: 65,
@@ -167,20 +167,21 @@ const styles = StyleSheet.create({
     polygon: { opacity: 0.7, bottom: 23, left: 140, width: 90, height: 23,},
     button: {
         flexDirection: 'row',
-        height: 72,
-        width: 72,
+        height: '87%',
+        width: '19%',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 5,
         borderColor: "white",
         borderRadius: 22,
+        opacity: 0.6,
     },
     button1: { backgroundColor: 'rgb(126, 94, 240)'},
     button2: { backgroundColor: 'rgb(101, 152, 236)'},
     button3: { backgroundColor: 'rgb(250, 123, 205)'},
     button4: { backgroundColor: 'rgb(247, 159, 201)'},
     button0: { backgroundColor: 'rgb(250, 186, 171)'},
-    buttoncenter: { top: 10, height: 80, width: 80,},
+    buttoncenter: { top: 10, height: '95%', width: '20%', opacity: 1,},
     buttonText1: {
         fontSize: 34,
         fontWeight: 'bold',

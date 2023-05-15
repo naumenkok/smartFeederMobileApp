@@ -1,51 +1,131 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import {View, ImageBackground, Modal, StyleSheet, TouchableOpacity, Text, TextInput} from 'react-native';
+import {
+    View,
+    ImageBackground,
+    Modal,
+    StyleSheet,
+    Button,
+    TouchableOpacity,
+    Text,
+    TextInput,
+    Keyboard
+} from 'react-native';
 import Constants from 'expo-constants';
 
 export default function ModalWindow({ visible, onClose }) {
 
     const [data, setData] = useState('');
-  
-    const fetchData = async () => {
+    const [times, setTimes] = useState(Array(5).fill(''));
+    const [amounts, setAmounts] = useState(Array(5).fill(''));
+    const [hasError, setHasError] = useState(false);
+
+    useEffect(() => {
+        const isError = times.some((time) => {
+            const [hours, minutes] = time.split(':');
+            return parseInt(hours) < 0 || parseInt(hours) > 23 || parseInt(minutes) < 0 || parseInt(minutes) > 59;
+        });
+        setHasError(isError);
+    }, [times]);
+
+    const postData = async () => {
       try {
         const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
-        const response = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
-            params: {date: "2023-05-05"}
+        const response = await axios.post(`http://${ipAddress}:8080/postNewDiet`,  {
+            times: times,
+            amounts: amounts
         });
         setData(response.data);
       } catch (error) {
-        console.error(error); 
+        console.error(error);
       }
     };
-  
-    useEffect(() => {
-      fetchData();
-      const intervalId = setInterval(fetchData, 2000);
-      return () => clearInterval(intervalId);
-    }, []);
+
+    const onCloseModal = () => {
+        setTimes(Array(5).fill(''));
+        setAmounts(Array(5).fill(''));
+        onClose();
+    };
 
   return (
     <Modal visible={visible} animationType='slide'>
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
         <View style={[styles.container, styles.shadowProp]}>
             <Text style={[styles.text, styles.text1]}>Change diet:</Text>
-            <TextInput style={styles.input}
-                placeholder="Time"
-            />
-            <TextInput
-                placeholder="Time"
-            />
+            {[...Array(5)].map((_, index) =>(
+                <View  key={index} style={styles.container4}>
+                    <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
+                        Meal {index}:
+                    </Text>
+                    <TextInput style={[styles.text, styles.text2, { textAlign: 'center' }]}
+                               maxLength={2}
+                               keyboardType="numeric"
+                               returnKeyType="done"
+                               onSubmitEditing={() => Keyboard.dismiss()}
+                               onChangeText={(hours) => {
+                                   const newTime = times[index].split(':')[1] || '00'; // extract minutes from existing value or default to 0
+                                   const newTimeString = `${hours}:${newTime}`;
+                                   const newTimes = [...times];
+                                   newTimes[index] = newTimeString;
+                                   setTimes(newTimes);
+                               }}
+                               value={times[index].split(':')[0] || ''} // display minutes from existing value or empty string
+                               placeholder="Hours"
 
-            <TouchableOpacity onPress={onClose}>
+                    />
+                    <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
+                       :
+                    </Text>
+                    <TextInput style={[styles.text, styles.text2, { textAlign: 'center' }]}
+                               maxLength={2}
+                               keyboardType="numeric"
+                               returnKeyType="done"
+                               onSubmitEditing={() => Keyboard.dismiss()}
+                               onChangeText={(minutes) => {
+                                   const newTime = times[index].split(':')[0] || '00'; // extract hours from existing value or default to 0
+                                   const newTimeString = `${newTime}:${minutes}`;
+                                   const newTimes = [...times];
+                                   newTimes[index] = newTimeString;
+                                   setTimes(newTimes);
+                               }}
+                               value={times[index].split(':')[1] || ''} // display minutes from existing value or empty string
+                               placeholder="Minutes"
+                    />
+
+                    <TextInput style={[styles.text, styles.text2]}
+                               maxLength={3}
+                               keyboardType="numeric"
+                               returnKeyType="done"
+                               onSubmitEditing={() => Keyboard.dismiss()}
+                               onChangeText={amount => {
+                                   const newAmount = amount.replace(/[^0-9]/g, '');
+                                   if (newAmount.length <= 3) { // check that the entered text is at most 2 characters long
+                                       const newAmounts = [...amounts];
+                                       newAmounts[index] = newAmount;
+                                       setAmounts(newAmounts);
+                                   }
+                               }}
+                               value={amounts[index]}
+                               placeholder="Amount"
+                    />
+                </View>
+            ))}
+            {hasError && <Text style={[styles.text, styles.text1]}>Wrong time!</Text>}
+            <View style={styles.container4}>
+            <TouchableOpacity onPress={() => !hasError && postData()}>
+                <Text style={[styles.text, styles.text3]}>Submit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={onCloseModal}>
                 <Text style={[styles.text, styles.text3]}>Close</Text>
             </TouchableOpacity>
+            </View>
         </View>
     </ImageBackground>
     </Modal>
   );
 }
+
 
 const styles = StyleSheet.create({
     imageBackground: {
@@ -56,8 +136,8 @@ const styles = StyleSheet.create({
       },
     container: {
         padding: 20,
-        width: '80%',
-        height: '50%',
+        width: '90%',
+        height: '65%',
         backgroundColor: 'white',
         marginHorizontal: '3%',
         borderRadius: 22,
@@ -76,9 +156,8 @@ const styles = StyleSheet.create({
         color: 'rgb(126, 94, 240)',
     },
     text2: {
-        fontSize: 20,
+        fontSize: 16,
         color: 'rgb(101, 152, 236)',
-        paddingTop: 3,
     },
     text3: {
         fontSize: 16,
@@ -91,7 +170,11 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 10,
     },
-    input:{
-    }
+    container4:{
+        paddingHorizontal: 15,
+        paddingTop: 15,
+        flexDirection: 'row',
+        justifyContent:'space-between',
+    },
   });
   

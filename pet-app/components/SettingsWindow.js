@@ -29,23 +29,20 @@ export default function SettingsWindow({ visible, onClose }) {
             <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
 
 
-                    <View style={[styles.container, styles.shadowProp]}>
-                        <Text style={[styles.text, styles.text1]}>Current diet:</Text>
-                        {data.times.map((time, index) => (
-                            <View  key={index} style={styles.container4}>
-                                <Text style={[styles.text, styles.text1, { textAlign: 'center' }]}>
-                                    {time}{'        '}
-                                </Text>
-                                <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
-                                    Meal {index}:   {data.amounts[index]}{'        '}
-                                </Text>
-                            </View>
-                        ))}
+                <View style={[styles.container, styles.shadowProp]}>
+                    <Text style={[styles.text, styles.text1]}>Current diet:</Text>
+                    {data.times.map((time, index) => (
+                        <View  key={index} style={styles.container4}>
+                            <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
+                                Meal {index}:{' '}{time}{' - '}{data.amounts[index]}
+                            </Text>
+                        </View>
+                    ))}
 
-                        <TouchableOpacity onPress={onClose}>
-                            <Text style={[styles.text, styles.text3]}>Close</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={onClose}>
+                        <Text style={[styles.text, styles.text3]}>Close</Text>
+                    </TouchableOpacity>
+                </View>
 
 
 
@@ -72,7 +69,7 @@ const styles = StyleSheet.create({
         marginTop: '5%',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        alignItems: 'stretch',
+        alignItems: 'center',
     },
     container4:{
         paddingHorizontal: 40,
