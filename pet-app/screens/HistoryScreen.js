@@ -1,27 +1,16 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { ImageBackground, View, StyleSheet, Text, Image, PanResponder} from 'react-native';
+import { ImageBackground, View, StyleSheet, Text, Image } from 'react-native';
 import BottomTab from '../components/BottomTab';
 import DateTab from '../components/DateTab';
 import axios from 'axios';
 import Constants from 'expo-constants';
 
 
-export default function HomeScreen ({ navigation }) {
-
-    const [history, setHistory] = useState({ times: [], amounts: [] });
+export default function HomeScreen ({ route, navigation }) {
     const [amount, setAmount] = useState({message: 0});
-    const [today, setToday] = useState(new Date());
-    const [panResponder, setPanResponder] = useState(
-        PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderRelease: (e, gestureState) => {
-                if (gestureState.dy > 50) {
-                    navigation.navigate('HistoryScreen', {today});
-                }
-            },
-        })
-    );
+    const { myParam } = route.params;
+    const [today, setToday] = useState(myParam);
 
     const getYesterday = () => {
         let d = new Date(today.getTime());
@@ -50,13 +39,6 @@ export default function HomeScreen ({ navigation }) {
     const fetchData = async () => {
         try {
             const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
-            const historyResponse = await axios.get(`http://${ipAddress}:8080/getEatHistoryInDate`, {
-                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1)
-                        .toString()
-                        .padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`}
-            });
-            setHistory(historyResponse.data);
-
             const amountResponse = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
                 params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`}
             });
@@ -72,10 +54,12 @@ export default function HomeScreen ({ navigation }) {
         return () => clearInterval(intervalId);
     }, [today]);
 
-  return (
-    <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground} {...panResponder.panHandlers}>
+    return (
+        <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
+            <View style={[styles.container, styles.container2, styles.shadowProp]}>
+            </View>
             <DateTab
-                myMarginTop={ '25%'}
+                myMarginTop={ '0%'}
                 today={today}
                 setToday={setToday}
                 getBefYesterday={getBefYesterday}
@@ -83,33 +67,11 @@ export default function HomeScreen ({ navigation }) {
                 getTomorrow={getTomorrow}
                 getAftTomorrow={getAftTomorrow}
             />
-            <View style={[styles.container, styles.container2, styles.shadowProp]}>
-                {history.times.map((time, index) => (
-                    <View  key={index} style={styles.container4}>
-                        <Text style={[styles.text, styles.text1, { textAlign: 'center' }]}>
-                            {time}{'    '}
-                        </Text>
-                        <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
-                            Meal {index}:    {history.amounts[index]}{'        '}
-                        </Text>
-                        <Image source={require('./../img/Ok.png')} style={[styles.img]}/>
-                    </View>
-                ))}
-                {amount.message !== null && amount.message !== 0 ? (
-                    <Text style={[styles.text, styles.text3, {textAlign: 'center'}]}>
-                        Eaten in this day: {amount.message}
-                    </Text>
-                ) : (
-                    <Text style={[styles.text, styles.text3, {textAlign: 'center'}]}>
-                        Nothing was eaten
-                    </Text>
-                )}
-            </View>
             <View style={[styles.container, styles.container3, styles.shadowProp]}>
                 <BottomTab navigation={navigation} screenType={'HomeScreen'}></BottomTab>
             </View>
-    </ImageBackground>
-  );
+        </ImageBackground>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -118,7 +80,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-      },
+    },
     container: {
         flexDirection: 'row',
         backgroundColor: 'white',
@@ -126,9 +88,9 @@ const styles = StyleSheet.create({
         borderRadius: 22,
     },
     container2: {
-        flex: 65,
-        marginBottom: '5%',
-        marginTop: '5%',
+        flex: 75,
+        marginTop: '15%',
+        marginBottom: '7%',
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'stretch',
@@ -144,9 +106,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     text: {
-      fontWeight: 'bold',
-      color: "white",
-      textAlign: 'center',
+        fontWeight: 'bold',
+        color: "white",
+        textAlign: 'center',
     },
     text1: {
         fontSize: 24,
@@ -162,13 +124,12 @@ const styles = StyleSheet.create({
         color: 'rgb(250, 123, 205)',
         paddingTop: 15,
     },
-    shadowProp: {  
-      shadowColor: 'rgb(86, 41, 246)',
-      shadowOpacity: 0.5,
-      shadowOffset: { width: 0, height: 2},
-      shadowRadius: 10,
-      elevation: 10,
+    shadowProp: {
+        shadowColor: 'rgb(86, 41, 246)',
+        shadowOpacity: 0.5,
+        shadowOffset: { width: 0, height: 2},
+        shadowRadius: 10,
+        elevation: 10,
     },
     img: { marginTop: 7,},
-  });
-  
+});

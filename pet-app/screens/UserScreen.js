@@ -1,11 +1,7 @@
 import React from 'react';
-import { useRef, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Modal, Image, Alert } from 'react-native';
-import { Animated } from 'react-native';
 import BottomTab from '../components/BottomTab';
-import { AppLoading } from 'expo';
-import { useFonts } from 'expo-font';
-import * as Font from 'expo-font';
 import ModalWindow from '../components/ModalWindow';
 import SettingsWindow from '../components/SettingsWindow';
 
@@ -36,7 +32,7 @@ export default function UserScreen ({ navigation }) {
 
         <View style={[styles.container, styles.container2, styles.shadowProp]}>
             <TouchableOpacity 
-                    onPress={() => navigation.navigate('HomeScreen')}>
+                    onPress={() => navigation.navigate('HistoryScreen')}>
                 <Text style={[styles.text, styles.text1]} >VIEW HISTORY</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line3.png')} style={styles.arrow} />
