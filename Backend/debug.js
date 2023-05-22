@@ -5,6 +5,7 @@ var spanWaterLevel = document.getElementById("spanWaterLevel");
 var spanBatteryLevel = document.getElementById("spanBatteryLevel");
 var spanContainerFoodLevel = document.getElementById("spanContainerFoodLevel");
 var spanContainerWaterLevel = document.getElementById("spanContainerWaterLevel");
+var spanDebugFull = document.getElementById("spanDebugFull");
 var divFoodDoor = document.getElementById("divFoodDoor");
 var divWaterDoor = document.getElementById("divWaterDoor");
 var divCharging = document.getElementById("divCharging");
@@ -94,7 +95,6 @@ async function postNewLevel(newLevel_) {
 
 async function getSimStatus(){
     const res = await (await fetch(baseUrl + "/getSimStatus")).json();
-    test = res;
     spanFoodLevel.textContent = res.food;
     spanWaterLevel.textContent = res.water;
     spanContainerFoodLevel.textContent = res.containerFood;
@@ -118,6 +118,8 @@ async function getSimStatus(){
     else{
         divCharging.style.backgroundColor = "red"
     }
+    const res_full = await (await fetch(baseUrl + "/getSimStatusFull")).json();
+    spanDebugFull.textContent = JSON.stringify(res_full);
 }
 
 var test;
