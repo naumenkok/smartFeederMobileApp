@@ -345,6 +345,46 @@ app.get('/checkLogin', async (req, res) => {
   }
 });
 
+app.get('/getDogsBreeds', async (req, res) => {
+  try {
+    const breeds = await getDogsBreeds();
+
+    res.json({ breeds });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving column values');
+  }
+});
+
+// nwm dokladnie co bedziemy brac do liczenia. na pewno ilosc pokarmów, rasa, waga, kalorycznosc karmy i może wiek?
+// potem dorobie funkcie calculateDogDiet na podstawie tego co dostane (zmysle jakis wzór na te parametry)
+// na razie zwraca podstawe wartosci przemnozene tylko przez modifier od rasy (modifier na razie tez przypadkowe)
+// tutaj lepiej dac body niz query bo sporo tego moze byc
+// na razie zalozmy ze beda pola: meals - liczba posilków dziennie, breed - nazwa rasy, weight - waga w kg, kcal - kcal karmy na jej 100 gram, age - wiek?
+// przykadlwoy return podobny jak przy notyfikacjach
+// {
+// 	"dietForDog": [
+// 		57,
+// 		76,
+// 		114,
+// 		95,
+// 		38
+// 	]
+// }
+// tyle miejsc w liscie ile posilkow zaplanowanych
+app.get('/getDogDietForBreed', async (req, res) => {
+  try {
+    const dogInfo = req.body; 
+    const dogDietModifiers = await getDogDietByBreedName(dogInfo.breed);
+    const dietForDog = calculateDogDiet(dogInfo, dogDietModifiers);
+
+    res.status(200).json({ dietForDog });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error retrieving dog diet');
+  }
+});
+
 app.post('/changeWaterBowlLimit', (req, res) => {
   const { limitUp, limitDown } = req.query;
 
@@ -380,7 +420,7 @@ app.post('/changeWaterBowlLimit', (req, res) => {
 
 
 app.get('/getAmountInDate', async (req, res) => {
-  const totalAmount = await selectAmountInDate(req.body.date);
+  const totalAmount = await selectAmountInDate(req.query.date);
   res.status(200).send({ message: totalAmount });
 });
 
@@ -550,6 +590,38 @@ function getCurrentTimeFormattedStr() {
   const minutes = String(currentDate.getMinutes()).padStart(2, '0');
   const formattedTime = `${hours}:${minutes}`;
   return formattedTime;
+}
+
+// https://www.zooplus.pl/magazyn/psy/zywienie-psa/obliczanie-prawidlowej-dziennej-racji-pokarmu-dla-psa
+// TO DO narazie taka przykladowa funckja
+function calculateDogDiet(dogInfo, dogDietModifiers){
+  let dailyCalories = 124.2 * Math.pow(dogInfo.weight,0.65) * (dogDietModifiers.modifier/100);
+  let dailyFoodAmount = Math.round((dailyCalories / dogInfo.kcal) * 100);
+  let dailyDogDiet;
+
+  switch (dogInfo.meals) {
+    case 1:
+      mealsRatios = [1];
+      dailyDogDiet = mealsRatios.map((num) => Math.round(num * dailyFoodAmount));
+      break;
+    case 2:
+      mealsRatios = [0.5, 0.5];
+      dailyDogDiet = mealsRatios.map((num) => Math.round(num * dailyFoodAmount));
+      break;
+    case 3:
+      mealsRatios = [0.35, 0.4, 0.25];
+      dailyDogDiet = mealsRatios.map((num) => Math.round(num * dailyFoodAmount));
+      break;
+    case 4:
+      mealsRatios = [0.2, 0.3, 0.3, 0.2];
+      dailyDogDiet = mealsRatios.map((num) => Math.round(num * dailyFoodAmount));
+      break;
+    case 5:
+      mealsRatios = [0.15, 0.2, 0.3, 0.25, 0.1];
+      dailyDogDiet = mealsRatios.map((num) => Math.round(num * dailyFoodAmount));
+      break;
+  }
+  return dailyDogDiet;
 }
 
 function reloadSchedule(){
@@ -795,6 +867,38 @@ async function selectFillHistoryInDate(date) {
     });
   });
 }
+
+async function getDogsBreeds() {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT name FROM dogDiets`;
+
+    db.all(query, (err, rows) => {
+      if (err) {
+        console.error(err);
+        reject('Error retrieving column values');
+      } else {
+        const values = rows.map((row) => row.name);
+        resolve(values);
+      }
+    });
+  });
+}
+
+function getDogDietByBreedName(breedName) {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT * FROM dogDiets WHERE name LIKE ?`;
+
+    db.get(query, [`%${breedName}%`], (err, row) => {
+      if (err) {
+        console.error(err);
+        reject('Error retrieving dog diet');
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
 
 // newDiet - map - key: String Time HH:MM ; value: Integer Amount 
 async function saveNewDietToDatabase(newDiet){
