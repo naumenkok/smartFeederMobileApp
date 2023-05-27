@@ -54,7 +54,6 @@ const AppNavigator = () => {
         <Stack.Screen
             name="HistoryScreen"
             component={HistoryScreen}
-            initialParams={{ today:new Date() }}
             options={{headerShown: false}}
         />
       </Stack.Navigator>

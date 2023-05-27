@@ -17,7 +17,7 @@ export default function HomeScreen ({ navigation }) {
             onStartShouldSetPanResponder: () => true,
             onPanResponderRelease: (e, gestureState) => {
                 if (gestureState.dy > 50) {
-                    navigation.navigate('HistoryScreen', {today});
+                    navigation.navigate('HistoryScreen');
                 }
             },
         })

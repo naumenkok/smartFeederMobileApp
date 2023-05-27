@@ -32,7 +32,8 @@ export default function UserScreen ({ navigation }) {
 
         <View style={[styles.container, styles.container2, styles.shadowProp]}>
             <TouchableOpacity 
-                    onPress={() => navigation.navigate('HistoryScreen')}>
+                    onPress={() => navigation.navigate('HistoryScreen')}
+            >
                 <Text style={[styles.text, styles.text1]} >VIEW HISTORY</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line3.png')} style={styles.arrow} />

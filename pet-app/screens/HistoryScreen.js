@@ -7,10 +7,9 @@ import axios from 'axios';
 import Constants from 'expo-constants';
 
 
-export default function HomeScreen ({ route, navigation }) {
-    const [amount, setAmount] = useState({message: 0});
-    const { myParam } = route.params;
-    const [today, setToday] = useState(myParam);
+export default function HomeScreen ({navigation }) {
+    const [amounts, setAmounts] = useState(Array(5).fill(0));
+    const [today, setToday] = useState(new Date());
 
     const getYesterday = () => {
         let d = new Date(today.getTime());
@@ -36,13 +35,36 @@ export default function HomeScreen ({ route, navigation }) {
         return new Date(d);
     };
 
+    const getHeight = (amount) => {
+        let myHeight = amount*3+10;
+        return myHeight;
+    };
+
     const fetchData = async () => {
         try {
             const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
-            const amountResponse = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
+            const amountAftTomorrow = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
+                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()+2).toString().padStart(2, '0')}`}
+            });
+            const amountTomorrow = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
+                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()+1).toString().padStart(2, '0')}`}
+            });
+            const amountToday = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
                 params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`}
             });
-            setAmount(amountResponse.data);
+            const amountYesterday = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
+                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()-1).toString().padStart(2, '0')}`}
+            });
+            const amountBefYesterday = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
+                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()-2).toString().padStart(2, '0')}`}
+            });
+            setAmounts([
+                amountAftTomorrow.data.message,
+                amountTomorrow.data.message,
+                amountToday.data.message,
+                amountYesterday.data.message,
+                amountBefYesterday.data.message
+            ]);
         }  catch (error) {
             console.error(error);
         }
@@ -55,8 +77,29 @@ export default function HomeScreen ({ route, navigation }) {
     }, [today]);
 
     return (
-        <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
-            <View style={[styles.container, styles.container2, styles.shadowProp]}>
+        <ImageBackground source={require('./../img/background.jpg')} style={styles().imageBackground}>
+            <View style={[styles().container, styles().container2, styles().shadowProp]}>
+                <View style={styles().container4}>
+                    {amounts.map((amount, index) => (
+                        <View style={[styles().column, styles(getHeight(amount))[`column${(today.getDate()+index) % 5}`]]}>
+                            {/*<Text>getHeight(amount)</Text>*/}
+                        </View>
+                    ))}
+                    <View style={[styles().column, styles().column5]}>
+                    </View>
+                </View>
+
+                <View>
+                    {amounts.some((amount) => {return amount !== null && amount !== 0})? (
+                        <Text style={[styles().text, styles().text3, {textAlign: 'center'}]}>
+                            History diagram:
+                        </Text>
+                    ) : (
+                        <Text style={[styles().text, styles().text3, {textAlign: 'center'}]}>
+                            Nothing was eaten!!!
+                        </Text>
+                    )}
+                </View>
             </View>
             <DateTab
                 myMarginTop={ '0%'}
@@ -67,14 +110,14 @@ export default function HomeScreen ({ route, navigation }) {
                 getTomorrow={getTomorrow}
                 getAftTomorrow={getAftTomorrow}
             />
-            <View style={[styles.container, styles.container3, styles.shadowProp]}>
+            <View style={[styles().container, styles().container3, styles().shadowProp]}>
                 <BottomTab navigation={navigation} screenType={'HomeScreen'}></BottomTab>
             </View>
         </ImageBackground>
     );
 }
 
-const styles = StyleSheet.create({
+const styles = (myHeight = 40) => StyleSheet.create({
     imageBackground: {
         opacity: 0.7,
         flex: 1,
@@ -92,19 +135,26 @@ const styles = StyleSheet.create({
         marginTop: '15%',
         marginBottom: '7%',
         flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
+        justifyContent: 'flex-end',
+        paddingBottom: 15,
     },
     container3: {
         flex: 8,
         marginVertical: '5%',
     },
     container4:{
-        paddingHorizontal: 40,
-        paddingTop: 15,
-        flexDirection: 'row',
+        paddingHorizontal: 5,
+        flexDirection: 'row-reverse',
         justifyContent: 'space-between',
+        alignItems: 'flex-end',
     },
+    column: {width: '15%', height: 10, borderRadius: 22,},
+    column1: { height: myHeight, backgroundColor: 'rgb(250, 186, 171)'},
+    column2: { height: myHeight, backgroundColor: 'rgb(247, 159, 201)'},
+    column3: { height: myHeight, backgroundColor: 'rgb(250, 123, 205)'},
+    column4: { height: myHeight, backgroundColor: 'rgb(101, 152, 236)'},
+    column0: { height: myHeight, backgroundColor: 'rgb(126, 94, 240)'},
+    column5: {width: '10%'},
     text: {
         fontWeight: 'bold',
         color: "white",

@@ -25,9 +25,11 @@ export default function ModalWindow({ visible, onClose }) {
         const isError = times.some((time) => {
             const [hours, minutes] = time.split(':');
             return parseInt(hours) < 0 || parseInt(hours) > 23 || parseInt(minutes) < 0 || parseInt(minutes) > 59;
+        }) || amounts.some((amount) => {
+            return parseInt(amount) < 0 || parseInt(amount) > 200 ;
         });
         setHasError(isError);
-    }, [times]);
+    }, [times, amounts]);
 
     const postData = async () => {
       try {
@@ -64,13 +66,13 @@ export default function ModalWindow({ visible, onClose }) {
                                returnKeyType="done"
                                onSubmitEditing={() => Keyboard.dismiss()}
                                onChangeText={(hours) => {
-                                   const newTime = times[index].split(':')[1] || '00'; // extract minutes from existing value or default to 0
+                                   const newTime = times[index].split(':')[1] || '00';
                                    const newTimeString = `${hours}:${newTime}`;
                                    const newTimes = [...times];
                                    newTimes[index] = newTimeString;
                                    setTimes(newTimes);
                                }}
-                               value={times[index].split(':')[0] || ''} // display minutes from existing value or empty string
+                               value={times[index].split(':')[0] || ''}
                                placeholder="Hours"
 
                     />
@@ -83,13 +85,13 @@ export default function ModalWindow({ visible, onClose }) {
                                returnKeyType="done"
                                onSubmitEditing={() => Keyboard.dismiss()}
                                onChangeText={(minutes) => {
-                                   const newTime = times[index].split(':')[0] || '00'; // extract hours from existing value or default to 0
+                                   const newTime = times[index].split(':')[0] || '00';
                                    const newTimeString = `${newTime}:${minutes}`;
                                    const newTimes = [...times];
                                    newTimes[index] = newTimeString;
                                    setTimes(newTimes);
                                }}
-                               value={times[index].split(':')[1] || ''} // display minutes from existing value or empty string
+                               value={times[index].split(':')[1] || ''}
                                placeholder="Minutes"
                     />
 
@@ -100,7 +102,7 @@ export default function ModalWindow({ visible, onClose }) {
                                onSubmitEditing={() => Keyboard.dismiss()}
                                onChangeText={amount => {
                                    const newAmount = amount.replace(/[^0-9]/g, '');
-                                   if (newAmount.length <= 3) { // check that the entered text is at most 2 characters long
+                                   if (newAmount.length <= 3) {
                                        const newAmounts = [...amounts];
                                        newAmounts[index] = newAmount;
                                        setAmounts(newAmounts);
@@ -111,13 +113,13 @@ export default function ModalWindow({ visible, onClose }) {
                     />
                 </View>
             ))}
-            {hasError && <Text style={[styles.text, styles.text1]}>Wrong time!</Text>}
+            {hasError && <Text style={[styles.text, styles.text1]}>Wrong input data!</Text>}
             <View style={styles.container4}>
             <TouchableOpacity onPress={() => !hasError && postData()}>
                 <Text style={[styles.text, styles.text3]}>Submit</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onCloseModal}>
-                <Text style={[styles.text, styles.text3]}>Close</Text>
+                <Text style={[styles.text, styles.text3]}>Cancel</Text>
             </TouchableOpacity>
             </View>
         </View>
@@ -156,7 +158,7 @@ const styles = StyleSheet.create({
         color: 'rgb(126, 94, 240)',
     },
     text2: {
-        fontSize: 16,
+        fontSize: 15,
         color: 'rgb(101, 152, 236)',
     },
     text3: {
@@ -171,10 +173,10 @@ const styles = StyleSheet.create({
         elevation: 10,
     },
     container4:{
-        paddingHorizontal: 15,
+        paddingHorizontal: 5,
         paddingTop: 15,
         flexDirection: 'row',
-        justifyContent:'space-between',
+        justifyContent:'space-around',
     },
   });
   
