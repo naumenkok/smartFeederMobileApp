@@ -247,7 +247,7 @@ app.get('/getValveStatus', (req, res) => {
 
 // trzeba tutaj w body wyslac true/false
 app.post('/changeChargingStatus', (req, res) => {
-  checkCharging = res.body.charging;
+  checkCharging = req.body.charging;
   res.status(200).send();
 });
 
