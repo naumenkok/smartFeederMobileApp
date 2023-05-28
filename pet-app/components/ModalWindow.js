@@ -60,7 +60,7 @@ export default function ModalWindow({ visible, onClose }) {
                     <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
                         Meal {index}:
                     </Text>
-                    <TextInput style={[styles.text, styles.text2, { textAlign: 'center' }]}
+                    <TextInput style={[styles.text, styles.text2]}
                                maxLength={2}
                                keyboardType="numeric"
                                returnKeyType="done"
@@ -73,13 +73,13 @@ export default function ModalWindow({ visible, onClose }) {
                                    setTimes(newTimes);
                                }}
                                value={times[index].split(':')[0] || ''}
-                               placeholder="Hours"
+                               placeholder="Hour"
 
                     />
-                    <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
-                       :
+                    <Text style={[styles.text, styles.text2]}>
+                    :
                     </Text>
-                    <TextInput style={[styles.text, styles.text2, { textAlign: 'center' }]}
+                    <TextInput style={[styles.text, styles.text2]}
                                maxLength={2}
                                keyboardType="numeric"
                                returnKeyType="done"
@@ -92,9 +92,8 @@ export default function ModalWindow({ visible, onClose }) {
                                    setTimes(newTimes);
                                }}
                                value={times[index].split(':')[1] || ''}
-                               placeholder="Minutes"
+                               placeholder="Min"
                     />
-
                     <TextInput style={[styles.text, styles.text2]}
                                maxLength={3}
                                keyboardType="numeric"
@@ -137,8 +136,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
       },
     container: {
-        padding: 20,
-        width: '90%',
+        padding: 5,
+        width: '95%',
         height: '65%',
         backgroundColor: 'white',
         marginHorizontal: '3%',
@@ -149,6 +148,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly',
         alignItems: 'stretch',
     },
+    container4:{
+        paddingHorizontal: 5,
+        paddingTop: 15,
+        flexDirection: 'row',
+        justifyContent:'space-evenly',
+    },
     text: {
         fontWeight: 'bold',
         textAlign: 'center',
@@ -158,7 +163,7 @@ const styles = StyleSheet.create({
         color: 'rgb(126, 94, 240)',
     },
     text2: {
-        fontSize: 15,
+        fontSize: 16,
         color: 'rgb(101, 152, 236)',
     },
     text3: {
@@ -171,12 +176,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2},
         shadowRadius: 10,
         elevation: 10,
-    },
-    container4:{
-        paddingHorizontal: 5,
-        paddingTop: 15,
-        flexDirection: 'row',
-        justifyContent:'space-around',
     },
   });
   

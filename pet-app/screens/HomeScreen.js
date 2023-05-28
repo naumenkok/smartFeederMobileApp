@@ -8,45 +8,24 @@ import Constants from 'expo-constants';
 
 
 export default function HomeScreen ({ navigation }) {
-
     const [history, setHistory] = useState({ times: [], amounts: [] });
     const [amount, setAmount] = useState({message: 0});
     const [today, setToday] = useState(new Date());
-    const [panResponder, setPanResponder] = useState(
-        PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderRelease: (e, gestureState) => {
-                if (gestureState.dy > 50) {
-                    navigation.navigate('HistoryScreen');
-                }
-            },
-        })
-    );
+    const [panResponder, setPanResponder] = useState(null);
 
-    const getYesterday = () => {
-        let d = new Date(today.getTime());
-        d.setDate(d.getDate() - 1);
-        return new Date(d);
-    };
 
-    const getBefYesterday = () => {
-        let d = getYesterday();
-        d.setDate(d.getDate() - 1);
-        return new Date(d);
-    };
-
-    const getTomorrow = () => {
-        let d = new Date(today.getTime());
-        d.setDate(d.getDate() + 1);
-        return new Date(d);
-    };
-
-    const getAftTomorrow = () => {
-        let d = getTomorrow();
-        d.setDate(d.getDate() + 1);
-        return new Date(d);
-    };
-
+    useEffect(() => {
+        setPanResponder(
+            PanResponder.create({
+                onStartShouldSetPanResponder: () => true,
+                onPanResponderRelease: (e, gestureState) => {
+                    if (gestureState.dy > 50) {
+                        navigation.navigate('HistoryScreen', { today:today.toISOString() });
+                    }
+                },
+            })
+        );
+    }, [today]);
     const fetchData = async () => {
         try {
             const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
@@ -73,15 +52,12 @@ export default function HomeScreen ({ navigation }) {
     }, [today]);
 
   return (
-    <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground} {...panResponder.panHandlers}>
+    <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground} {...panResponder?.panHandlers}>
             <DateTab
                 myMarginTop={ '25%'}
+                isHistory = {false}
                 today={today}
                 setToday={setToday}
-                getBefYesterday={getBefYesterday}
-                getYesterday={getYesterday}
-                getTomorrow={getTomorrow}
-                getAftTomorrow={getAftTomorrow}
             />
             <View style={[styles.container, styles.container2, styles.shadowProp]}>
                 {history.times.map((time, index) => (

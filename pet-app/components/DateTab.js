@@ -1,37 +1,49 @@
 import React from 'react';
 import {View, TouchableOpacity, Text, StyleSheet} from 'react-native'
+import axios from "axios";
 
-export default function DateBar ({ myMarginTop, today, setToday, getBefYesterday, getYesterday, getTomorrow, getAftTomorrow }) {
+export default function DateBar ({ myMarginTop, isHistory, today, setToday }) {
+    const renderTouchableOpacity = (day) => {
+        const currentDate = new Date(today.getTime());
+        currentDate.setDate(currentDate.getDate() + day);
+        const buttonStyle = day === 0 ? [styles(myMarginTop, isHistory)[`button${today.getDate() % 5}`], styles(myMarginTop, isHistory).buttoncenter] : styles(myMarginTop, isHistory)[`button${currentDate.getDate() % 5}`];
+        return (
+            <TouchableOpacity
+                onPress={() => setToday(currentDate)}
+                style={[styles(myMarginTop, isHistory).button, buttonStyle, styles(myMarginTop, isHistory).shadowProp]}
+                key={day}
+            >
+                <Text style={styles(myMarginTop, isHistory).buttonText1}>{currentDate.getDate()}</Text>
+            </TouchableOpacity>
+        );
+    };
+
     return (
-        <View style={[styles().container, styles(myMarginTop).container1, styles().shadowProp]}>
-            <TouchableOpacity onPress={() => setToday(getBefYesterday())} style={[styles().button, styles()[`button${getBefYesterday().getDate() % 5}`]]}>
-                <Text style={styles().buttonText1}>{getBefYesterday().getDate()}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setToday(getYesterday())} style={[styles().button, styles()[`button${getYesterday().getDate() % 5}`]]}>
-                <Text style={styles().buttonText1}>{getYesterday().getDate()}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles().button, styles()[`button${today.getDate() % 5}`], styles().buttoncenter, styles().shadowProp]}>
-                <Text style={styles().buttonText1}>{today.getDate()}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setToday(getTomorrow())} style={[styles().button, styles()[`button${getTomorrow().getDate() % 5}`]]}>
-                <Text style={styles().buttonText1}>{getTomorrow().getDate()}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setToday(getAftTomorrow())} style={[styles().button, styles()[`button${getAftTomorrow().getDate() % 5}`]]}>
-                <Text style={styles().buttonText1}>{getAftTomorrow().getDate()}</Text>
-            </TouchableOpacity>
+        <View style={[styles(myMarginTop, isHistory).container, styles(myMarginTop, isHistory).container1, styles(myMarginTop, isHistory).shadowProp]}>
+            {(() => {
+                const components = [];
+                const dayAmounts = isHistory? 4:2;
+                for (let day = -dayAmounts; day <= dayAmounts; day++) {
+                    components.push(renderTouchableOpacity(day));
+                }
+                return components;
+            })()}
         </View>
     );
 };
-const styles = (myMarginTop = '0%') => StyleSheet.create({
+const styles = (myMarginTop = '0%', isHistory = false) => StyleSheet.create({
     container: {
         flexDirection: 'row',
         backgroundColor: 'white',
-        marginHorizontal: '3%',
+        marginHorizontal: '5%',
+        left: isHistory? 14:0,
+        bottom: isHistory? 20:0,
         borderRadius: 22,
+        height: isHistory? '7%':'7%' ,
     },
     container1: {
-        flex: 10,
-        marginBottom: '5%',
+        flex: isHistory? 0:10,
+        marginBottom: isHistory? '0%':'5%',
         marginTop: myMarginTop,
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -47,22 +59,24 @@ const styles = (myMarginTop = '0%') => StyleSheet.create({
     button: {
         flexDirection: 'row',
         height: '90%',
-        width: '19%',
+        width: isHistory? '11%':'19%',
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 5,
+        borderWidth: isHistory? 4:5,
         borderColor: "white",
-        borderRadius: 22,
+        borderRadius: isHistory? 15:22,
         opacity: 0.6,
     },
     button1: { backgroundColor: 'rgb(126, 94, 240)'},
     button2: { backgroundColor: 'rgb(101, 152, 236)'},
     button3: { backgroundColor: 'rgb(250, 123, 205)'},
-    button4: { backgroundColor: 'rgb(247, 159, 201)'},
-    button0: { backgroundColor: 'rgb(250, 186, 171)'},
-    buttoncenter: { top: 10, height: '99%', width: '20%', opacity: 1,},
+    button4: { backgroundColor: 'rgb(250, 186, 171)'},
+    button0: { backgroundColor: 'rgb(252, 212, 140)'},
+    buttoncenter: {
+        top: isHistory? -10:10,
+        height: '99%', width: isHistory? '12%':'20%', opacity: 1,},
     buttonText1: {
-        fontSize: 34,
+        fontSize: isHistory? 14:34,
         fontWeight: 'bold',
         color: "white",
         textTransform: 'uppercase',

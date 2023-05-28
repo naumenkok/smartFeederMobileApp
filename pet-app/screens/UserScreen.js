@@ -39,7 +39,7 @@ export default function UserScreen ({ navigation }) {
             <Image source={require('./../img/Line3.png')} style={styles.arrow} />
             <TouchableOpacity
                 onPress={() => setSettingsVisible(true)}>
-                <Text style={[styles.text, styles.text2]} >VIEW FOOD SETTINGS</Text>
+                <Text style={[styles.text, styles.text2]} >VIEW CURRENT SETTINGS</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line2.png')} style={styles.arrow} />
             <TouchableOpacity 
@@ -49,7 +49,7 @@ export default function UserScreen ({ navigation }) {
             <Image source={require('./../img/Line1.png')} style={styles.arrow} />
             <TouchableOpacity 
                     onPress={() => navigation.navigate('SignUpScreen')}>
-                <Text style={[styles.text, styles.text4]} >VIEW RECOMENDATION</Text>
+                <Text style={[styles.text, styles.text4]} >VIEW RECOMMENDATION</Text>
             </TouchableOpacity>
         </View>
 

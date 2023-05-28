@@ -5,70 +5,33 @@ import BottomTab from '../components/BottomTab';
 import DateTab from '../components/DateTab';
 import axios from 'axios';
 import Constants from 'expo-constants';
+import {LinearGradient} from 'expo-linear-gradient';
 
 
-export default function HomeScreen ({navigation }) {
-    const [amounts, setAmounts] = useState(Array(5).fill(0));
-    const [today, setToday] = useState(new Date());
-
-    const getYesterday = () => {
-        let d = new Date(today.getTime());
-        d.setDate(d.getDate() - 1);
-        return new Date(d);
-    };
-
-    const getBefYesterday = () => {
-        let d = getYesterday();
-        d.setDate(d.getDate() - 1);
-        return new Date(d);
-    };
-
-    const getTomorrow = () => {
-        let d = new Date(today.getTime());
-        d.setDate(d.getDate() + 1);
-        return new Date(d);
-    };
-
-    const getAftTomorrow = () => {
-        let d = getTomorrow();
-        d.setDate(d.getDate() + 1);
-        return new Date(d);
-    };
-
-    const getHeight = (amount) => {
-        let myHeight = amount*3+10;
-        return myHeight;
-    };
-
+export default function HomeScreen ({route, navigation }) {
+    const [amounts, setAmounts] = useState(Array(9).fill(0));
+    const [today, setToday] = useState(new Date(route.params.today));
+    const maxHeight = 450;
+    const [maxAmount, setMaxAmount] = useState(1);
     const fetchData = async () => {
         try {
             const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
-            const amountAftTomorrow = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
-                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()+2).toString().padStart(2, '0')}`}
-            });
-            const amountTomorrow = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
-                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()+1).toString().padStart(2, '0')}`}
-            });
-            const amountToday = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
-                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`}
-            });
-            const amountYesterday = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
-                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()-1).toString().padStart(2, '0')}`}
-            });
-            const amountBefYesterday = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
-                params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()-2).toString().padStart(2, '0')}`}
-            });
-            setAmounts([
-                amountAftTomorrow.data.message,
-                amountTomorrow.data.message,
-                amountToday.data.message,
-                amountYesterday.data.message,
-                amountBefYesterday.data.message
-            ]);
+            const myAmounts = [];
+            for (let day = 4; day >= -4; day--) {
+                const amount = await axios.get(`http://${ipAddress}:8080/getAmountInDate`, {
+                    params: {date: `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()+day).toString().padStart(2, '0')}`}
+                });
+                myAmounts.push(amount.data.message);
+            }
+            setAmounts(myAmounts);
         }  catch (error) {
             console.error(error);
         }
     };
+
+    useEffect(() => {
+        setMaxAmount(Math.max(...amounts));
+    }, [amounts]);
 
     useEffect(() => {
         fetchData();
@@ -76,40 +39,49 @@ export default function HomeScreen ({navigation }) {
         return () => clearInterval(intervalId);
     }, [today]);
 
+    const getHeight = (amount) => {
+        if (maxAmount === 0) {
+            return 5;
+        }
+        return maxHeight*amount/maxAmount+5;
+    };
+
     return (
         <ImageBackground source={require('./../img/background.jpg')} style={styles().imageBackground}>
             <View style={[styles().container, styles().container2, styles().shadowProp]}>
-                <View style={styles().container4}>
-                    {amounts.map((amount, index) => (
-                        <View style={[styles().column, styles(getHeight(amount))[`column${(today.getDate()+index) % 5}`]]}>
-                            {/*<Text>getHeight(amount)</Text>*/}
-                        </View>
-                    ))}
-                    <View style={[styles().column, styles().column5]}>
-                    </View>
-                </View>
-
                 <View>
                     {amounts.some((amount) => {return amount !== null && amount !== 0})? (
-                        <Text style={[styles().text, styles().text3, {textAlign: 'center'}]}>
+                        <Text style={[styles().text, {bottom: 25}]}>
                             History diagram:
                         </Text>
                     ) : (
-                        <Text style={[styles().text, styles().text3, {textAlign: 'center'}]}>
+                        <Text style={[styles().text, {bottom: 30}]}>
                             Nothing was eaten!!!
                         </Text>
                     )}
                 </View>
+                <View style={styles().container4}>
+                    {amounts.map((amount, index) => (
+                        <LinearGradient
+                            colors={['rgb(250, 186, 171)', 'rgb(250, 123, 205)', 'rgb(126, 94, 240)']}
+                            style={[styles().column, styles(getHeight(amount))[`column${(today.getDate()+index) % 5}`]]}
+                            key={index}
+                        >
+                        </LinearGradient>
+                    ))}
+                    <View style={[styles().column, styles().column5]}>
+                        <Text style={styles().labelText}>{maxAmount}</Text>
+                        <Text style={styles().labelText}>{maxAmount/2}</Text>
+                        <Text style={[styles().labelText, {height: 15, bottom: 10}]}>{0}</Text>
+                    </View>
+                </View>
+                <DateTab
+                    myMarginTop={ '10%'}
+                    isHistory = {true}
+                    today={today}
+                    setToday={setToday}
+                />
             </View>
-            <DateTab
-                myMarginTop={ '0%'}
-                today={today}
-                setToday={setToday}
-                getBefYesterday={getBefYesterday}
-                getYesterday={getYesterday}
-                getTomorrow={getTomorrow}
-                getAftTomorrow={getAftTomorrow}
-            />
             <View style={[styles().container, styles().container3, styles().shadowProp]}>
                 <BottomTab navigation={navigation} screenType={'HomeScreen'}></BottomTab>
             </View>
@@ -131,12 +103,12 @@ const styles = (myHeight = 40) => StyleSheet.create({
         borderRadius: 22,
     },
     container2: {
-        flex: 75,
+        flex: 85,
         marginTop: '15%',
-        marginBottom: '7%',
+        marginBottom: '5%',
         flexDirection: 'column',
         justifyContent: 'flex-end',
-        paddingBottom: 15,
+        paddingBottom: 10,
     },
     container3: {
         flex: 8,
@@ -148,31 +120,26 @@ const styles = (myHeight = 40) => StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'flex-end',
     },
-    column: {width: '15%', height: 10, borderRadius: 22,},
-    column1: { height: myHeight, backgroundColor: 'rgb(250, 186, 171)'},
-    column2: { height: myHeight, backgroundColor: 'rgb(247, 159, 201)'},
-    column3: { height: myHeight, backgroundColor: 'rgb(250, 123, 205)'},
-    column4: { height: myHeight, backgroundColor: 'rgb(101, 152, 236)'},
-    column0: { height: myHeight, backgroundColor: 'rgb(126, 94, 240)'},
-    column5: {width: '10%'},
+    column: {width: '9%', height: 10, borderRadius: 22,},
+    column1: { height: myHeight },
+    column2: { height: myHeight },
+    column3: { height: myHeight },
+    column4: { height: myHeight },
+    column0: { height: myHeight },
+    column5: {width: '7%', height: 450, flexDirection: 'column', justifyContent: 'space-around'},
     text: {
         fontWeight: 'bold',
-        color: "white",
-        textAlign: 'center',
-    },
-    text1: {
-        fontSize: 24,
+        fontSize: 20,
         color: 'rgb(126, 94, 240)',
-    },
-    text2: {
-        fontSize: 20,
-        color: 'rgb(101, 152, 236)',
-        paddingTop: 3,
-    },
-    text3: {
-        fontSize: 20,
-        color: 'rgb(250, 123, 205)',
         paddingTop: 15,
+        textAlign: 'center'
+    },
+    labelText:{
+        fontWeight: 'bold',
+        textAlign: 'center',
+        fontSize: 14,
+        color: 'blue',
+        height: 235,
     },
     shadowProp: {
         shadowColor: 'rgb(86, 41, 246)',
