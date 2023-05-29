@@ -9,6 +9,8 @@ public class AnimalMovement : MonoBehaviour
     public float moveRange = 20f;
     private bool facingRight = true;
     private bool isEating = false;
+    private bool isWaiting = false;
+
     public HungerHandler hungerHandlerRef;
     private GetFoodLevelInBowl foodLevelInBowlRef;
     private GetWaterLevelInBowl waterLevelInBowlRef;
@@ -68,18 +70,19 @@ public class AnimalMovement : MonoBehaviour
             return;
         }
 
-        if ((foodLevel <= 0 && hungerHandlerRef.FoodInStomachPercentage > 90)
-            || waterLevel <= 0 && hungerHandlerRef.WaterInStomachPercentage > 90)
+        if ((foodLevel <= 0 || hungerHandlerRef.FoodInStomachPercentage > 93)
+            && (waterLevel <= 0 || hungerHandlerRef.WaterInStomachPercentage > 93) && !isEating && !isWaiting)
         {
             float moveDirection = facingRight ? 1 : -1;
             transform.Translate(moveDirection * moveSpeed * Time.deltaTime, 0, 0);
             isEating = false;
             animator.SetBool("isEating", false);
+            animator.SetBool("isDrinking", false);
             animator.SetBool("isMoving", true);
         }
         else
         {
-            if (!isEating)
+            if (!isEating && !isWaiting)
             {
                 if (hungerHandlerRef.FoodInStomachPercentage < hungerHandlerRef.WaterInStomachPercentage)
                 {
@@ -113,9 +116,9 @@ public class AnimalMovement : MonoBehaviour
                         }
                     }
                 }
-
             }
         }
+        
 
         void Flip()
         {
@@ -132,41 +135,49 @@ public class AnimalMovement : MonoBehaviour
             animator.SetBool("isEating", true);
             animator.SetBool("isMoving", false);
 
-            while (foodLevelInBowlRef.fillLevel > 0 && hungerHandlerRef.FoodInStomachPercentage < 95)
+            while (foodLevelInBowlRef.fillLevel > 0 && hungerHandlerRef.FoodInStomachPercentage < 98)
             {
                 StartCoroutine(PostEatFood(10));
                 animator.Play("pig_eat");
                 yield return new WaitForSeconds(interval);
             }
-
             isEating = false;
             animator.SetBool("isEating", false);
             animator.SetBool("isMoving", true);
             animator.Play("pig_idle");
+            
+            isWaiting = true;
+            yield return new WaitForSeconds(2f);
+            isWaiting = false;
         }
         
         IEnumerator DrinkWaterOverTime(float interval)
         {
             isEating = true;
             animator.SetBool("isMoving", false);
+            animator.SetBool("isDrinking", true);
 
-            while (foodLevelInBowlRef.fillLevel > 0 && hungerHandlerRef.WaterInStomachPercentage < 95)
+            while (waterLevelInBowlRef.fillLevel > 0 && hungerHandlerRef.WaterInStomachPercentage < 98)
             {
                 StartCoroutine(PostDrinkWater(10));
                 animator.Play("pig_drink");
                 yield return new WaitForSeconds(interval);
             }
-
             isEating = false;
+            animator.SetBool("isDrinking", false);
             animator.SetBool("isMoving", true);
             animator.Play("pig_idle");
+            
+            isWaiting = true;
+            yield return new WaitForSeconds(2f);
+            isWaiting = false;
         }
 
         IEnumerator PostEatFood(int amount)
         {
             string url = "http://localhost:8080/removeBowlFood?amount=" + amount;
             UnityWebRequest request = UnityWebRequest.Post(url, "");
-            hungerHandlerRef.FoodInStomachPercentage += 3;
+            hungerHandlerRef.FoodInStomachPercentage += 1;
             if (hungerHandlerRef.FoodInStomachPercentage >= 100)
             {
                 hungerHandlerRef.FoodInStomachPercentage = 100;
@@ -178,7 +189,7 @@ public class AnimalMovement : MonoBehaviour
         {
             string url = "http://localhost:8080/removeBowlWater?amount=" + amount;
             UnityWebRequest request = UnityWebRequest.Post(url, "");
-            hungerHandlerRef.WaterInStomachPercentage += 3;
+            hungerHandlerRef.WaterInStomachPercentage += 1;
             if (hungerHandlerRef.WaterInStomachPercentage >= 100)
             {
                 hungerHandlerRef.WaterInStomachPercentage = 100;
