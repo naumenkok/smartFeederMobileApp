@@ -9,6 +9,7 @@ public class AnimalMovement : MonoBehaviour
     public float moveRange = 20f;
     private bool facingRight = true;
     private bool isEating = false;
+    public HungerHandler hungerHandlerRef;
     private GetFoodLevelInBowl foodLevelInBowlRef;
     private GetWaterLevelInBowl waterLevelInBowlRef;
     private Animator animator;
@@ -60,7 +61,15 @@ public class AnimalMovement : MonoBehaviour
             Flip();
         }
 
-        if (foodLevel <= 0)
+        if ((hungerHandlerRef.FoodInStomachPercentage < 15 && foodLevel <= 0) ||
+            (hungerHandlerRef.WaterInStomachPercentage < 15 && waterLevel <= 0))
+        {
+            animator.Play("pig_cry");
+            return;
+        }
+
+        if ((foodLevel <= 0 && hungerHandlerRef.FoodInStomachPercentage > 90)
+            || waterLevel <= 0 && hungerHandlerRef.WaterInStomachPercentage > 90)
         {
             float moveDirection = facingRight ? 1 : -1;
             transform.Translate(moveDirection * moveSpeed * Time.deltaTime, 0, 0);
@@ -72,19 +81,39 @@ public class AnimalMovement : MonoBehaviour
         {
             if (!isEating)
             {
-                float moveDirectionToBowl = (rightFoodBound - leftFoodBound > 0) ? 1 : -1;
-                if ((moveDirectionToBowl > 0 && !facingRight) || (moveDirectionToBowl < 0 && facingRight))
+                if (hungerHandlerRef.FoodInStomachPercentage < hungerHandlerRef.WaterInStomachPercentage)
                 {
-                    Flip();
-                }
-                transform.Translate(moveDirectionToBowl * moveSpeed * Time.deltaTime, 0, 0);
-                if (transform.position.x >= leftFoodBound && transform.position.x <= rightFoodBound)
-                {
-                    if (!isEating)
+                    float moveDirectionToBowl = (rightFoodBound - leftFoodBound > 0) ? 1 : -1;
+                    if ((moveDirectionToBowl > 0 && !facingRight) || (moveDirectionToBowl < 0 && facingRight))
                     {
-                        StartCoroutine(EatFoodOverTime(1f));
+                        Flip();
+                    }
+                    transform.Translate(moveDirectionToBowl * moveSpeed * Time.deltaTime, 0, 0);
+                    if (transform.position.x >= leftFoodBound && transform.position.x <= rightFoodBound)
+                    {
+                        if (!isEating)
+                        {
+                            StartCoroutine(EatFoodOverTime(1f));
+                        }
                     }
                 }
+                else
+                {
+                    float moveDirectionToBowl = (rightWaterBound - leftWaterBound > 0) ? 1 : -1;
+                    if ((moveDirectionToBowl > 0 && !facingRight) || (moveDirectionToBowl < 0 && facingRight))
+                    {
+                        Flip();
+                    }
+                    transform.Translate(moveDirectionToBowl * moveSpeed * Time.deltaTime, 0, 0);
+                    if (transform.position.x >= leftWaterBound && transform.position.x <= rightWaterBound)
+                    {
+                        if (!isEating)
+                        {
+                            StartCoroutine(DrinkWaterOverTime(1f));
+                        }
+                    }
+                }
+
             }
         }
 
@@ -103,7 +132,7 @@ public class AnimalMovement : MonoBehaviour
             animator.SetBool("isEating", true);
             animator.SetBool("isMoving", false);
 
-            while (foodLevelInBowlRef.fillLevel > 0)
+            while (foodLevelInBowlRef.fillLevel > 0 && hungerHandlerRef.FoodInStomachPercentage < 95)
             {
                 StartCoroutine(PostEatFood(10));
                 animator.Play("pig_eat");
@@ -115,11 +144,45 @@ public class AnimalMovement : MonoBehaviour
             animator.SetBool("isMoving", true);
             animator.Play("pig_idle");
         }
+        
+        IEnumerator DrinkWaterOverTime(float interval)
+        {
+            isEating = true;
+            animator.SetBool("isMoving", false);
+
+            while (foodLevelInBowlRef.fillLevel > 0 && hungerHandlerRef.WaterInStomachPercentage < 95)
+            {
+                StartCoroutine(PostDrinkWater(10));
+                animator.Play("pig_drink");
+                yield return new WaitForSeconds(interval);
+            }
+
+            isEating = false;
+            animator.SetBool("isMoving", true);
+            animator.Play("pig_idle");
+        }
 
         IEnumerator PostEatFood(int amount)
         {
             string url = "http://localhost:8080/removeBowlFood?amount=" + amount;
             UnityWebRequest request = UnityWebRequest.Post(url, "");
+            hungerHandlerRef.FoodInStomachPercentage += 3;
+            if (hungerHandlerRef.FoodInStomachPercentage >= 100)
+            {
+                hungerHandlerRef.FoodInStomachPercentage = 100;
+            }
+            yield return request.SendWebRequest();
+        }
+        
+        IEnumerator PostDrinkWater(int amount)
+        {
+            string url = "http://localhost:8080/removeBowlWater?amount=" + amount;
+            UnityWebRequest request = UnityWebRequest.Post(url, "");
+            hungerHandlerRef.WaterInStomachPercentage += 3;
+            if (hungerHandlerRef.WaterInStomachPercentage >= 100)
+            {
+                hungerHandlerRef.WaterInStomachPercentage = 100;
+            }
             yield return request.SendWebRequest();
         }
     }

@@ -7,7 +7,7 @@ public class TimeHandler : MonoBehaviour
     public TimeSpan gameStartTime = new TimeSpan(7,0,0);
     public TimeSpan gameTimeSpan;
     public TextMeshProUGUI timeText;
-    public float secondsPerGameHour = 10f;
+    public float secondsPerGameHour = 60f;
 
     // Start is called before the first frame update
     void Start()

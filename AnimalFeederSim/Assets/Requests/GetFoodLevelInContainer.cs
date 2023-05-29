@@ -30,7 +30,6 @@ public class GetFoodLevelInContainer : MonoBehaviour
 
             UnityWebRequest request = UnityWebRequest.Get(endpointURL);
             yield return request.SendWebRequest();
-            Debug.Log("Getting Food level in container successful");
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string response = request.downloadHandler.text;
