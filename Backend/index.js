@@ -299,12 +299,11 @@ app.get('/getNotification', async (req, res) => {
   try {
     const notifications = await getNotifications(userID_, limit);
 
-    res.json({ notifications }); // Send the notifications as JSON
+    res.status(200).json({ notifications }); // Send the notifications as JSON
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error retrieving notifications' }); // Send an error response
   }
-  res.status(200).send();
 });
 
 // to tylk sprawdza czy jakies nowe powiadomienie jest czy go nie ma dla danego userID. nwm czy potrzebne ale mozecie to sprawdzic a potem zapytać
@@ -320,10 +319,10 @@ app.get('/checkNotificationStatus', async (req, res) => {
 });
 
 app.post('/registerNewUser', async (req, res) => {
-  const { username, password } = req.query;
+  const { username, password, name, email } = req.query;
 
   try {
-    const result = await insertNewUser(username, password);
+    const result = await insertNewUser(username, password, email, name);
     res.status(200).send(result);
   } catch (error) {
     console.error(error);
@@ -344,6 +343,23 @@ app.get('/checkLogin', async (req, res) => {
     res.status(500).send('Error checking login');
   }
 });
+
+//zwraca publiczne info o userze z danym id
+//jakby takiego nie bylo w bazie to zwroci null zamiast jsona z polami
+// username name e mail
+app.get('/getUserData', async (req, res) => {
+  const { userID } = req.query;
+
+  try {
+    const userInfo = await getUserData(userID);
+    console.log(userInfo);
+    res.status(200).json(userInfo); // Send the userInfo object as JSON
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error getting user data');
+  }
+});
+
 
 app.get('/getDogsBreeds', async (req, res) => {
   try {
@@ -428,13 +444,16 @@ app.get('/getEatHistoryInDate', async (req, res) => {
   const rows = await selectEatHistoryInDate(req.query.date);
   const times = [];
   const amounts = [];
+  const startTimes = [];
   rows.forEach(function(row) {
     times.push(row.time);
     amounts.push(row.amount);
+    startTimes.push(row.startTime);
   });
   const data = {
     times: times,
-    amounts: amounts
+    amounts: amounts,
+    startTimes: startTimes
   };
   res.status(200).json(data);
 });
@@ -478,7 +497,7 @@ async function checkKarmnikHealth(){
   // Powiadomienie przy spadku baterii ponizej 15%, jezeli go nie wyslalismy jeszcze oraz jezeli urzadzenie sie nie ładuje
   if (batteryLevel <= karmnikHealth.batteryLevelWarningLimit && !karmnikHealth.lowBatterySend && !checkCharging){
     karmnikHealth.lowBatterySend = true;
-    insertNotification("Low battery level! Plese plug your karmnik ASAP")
+    insertNotification("Low battery level! Please plug your karmnik ASAP")
   }
   // wylkaczenie karmnika przy mniej jak 5% baterii HARDCODED
   if (batteryLevel < 5){
@@ -491,7 +510,7 @@ async function checkKarmnikHealth(){
   // powiadoienie przy niskim poziomie jedzenia 
   if (containerFoodLevel < karmnikHealth.foodContainerWarningLevel && !karmnikHealth.lowFoodContainerSend){
     karmnikHealth.lowFoodContainerSend = true;
-    insertNotification("Low food container level! Plese fill up your karmnik ASAP")
+    insertNotification("Low food container level! Please fill up your karmnik ASAP")
   }
   // reset powiadomienia po napełneniu jedzenia
   if (karmnikHealth.lowFoodContainerSend && containerFoodLevel > karmnikHealth.foodContainerWarningLevel + 100){
@@ -500,7 +519,7 @@ async function checkKarmnikHealth(){
   // powiadomienie przy niskim poziomie wody
   if (containerWaterLevel < karmnikHealth.waterContainerWarningLevel && !karmnikHealth.lowWaterContainerSend){
     karmnikHealth.lowFoodContainerSend = true;
-    insertNotification("Low water container level! Plese fill up your karmnik ASAP")
+    insertNotification("Low water container level! Please fill up your karmnik ASAP")
   }
   // reset powiadomienia po napełneniu wody
   if (karmnikHealth.lowWaterContainerSend && containerWaterLevel > karmnikHealth.waterContainerWarningLevel + 100){
@@ -714,13 +733,13 @@ async function readCurrentDietFromDatabase() {
   });
 }
 
-async function insertNewUser(username, password) {
+async function insertNewUser(username, password, email, name) {
   return new Promise((resolve, reject) => {
     // Prepare the INSERT statement
-    const insertStatement = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+    const insertStatement = db.prepare('INSERT INTO users (username, password, email, name) VALUES (?, ?, ?, ?)');
 
     // Execute the INSERT statement with the provided username and password
-    insertStatement.run(username, password, function (err) {
+    insertStatement.run(username, password, email, name, function (err) {
       if (err) {
         if (err.errno === 19) {
           // SQLite error code 19 corresponds to a constraint violation
@@ -751,6 +770,22 @@ async function checkLogin(username, password) {
       } else {
         const userId = row ? row.id : 0;
         resolve(userId);
+      }
+    });
+  });
+}
+
+async function getUserData(userID) {
+  return new Promise((resolve, reject) => {
+    const query = `SELECT username, email, name FROM users WHERE id = ?`;
+
+    db.get(query, [userID], (err, row) => {
+      if (err) {
+        console.error(err);
+        reject(null);
+      } else {
+        const userInfo = row;
+        resolve(userInfo || null);
       }
     });
   });
@@ -845,7 +880,7 @@ async function selectAmountInDate(date) {
 async function selectEatHistoryInDate(date) {
   return new Promise((resolve, reject) => {
     // Execute the SELECT query
-    db.all('SELECT time, amount FROM eatHistory WHERE date LIKE ? ORDER BY time ASC', [date], (err, rows) => {
+    db.all('SELECT time, amount, startTime FROM eatHistory WHERE date LIKE ? ORDER BY time ASC', [date], (err, rows) => {
       if (err) {
         reject(err);
       } else {
