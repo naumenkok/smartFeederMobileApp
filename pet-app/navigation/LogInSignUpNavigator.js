@@ -19,49 +19,47 @@ const AppNavigator = () => {
         <Stack.Screen
           name="MainScreen"
           component={MainScreen}
-          options={{headerShown: false}}
+          options={{headerShown: false, animation: 'none'}}
         />
         <Stack.Screen
           name="LogInScreen"
           component={LogInScreen}
-          options={{headerShown: false}}
+          options={{headerShown: false, animation: 'none'}}
         />
         <Stack.Screen
           name="SignUpScreen"
           component={SignUpScreen}
-          options={{headerShown: false}}
+          options={{headerShown: false, animation: 'none'}}
         />
         <Stack.Screen
           name="LogoScreen"
           component={LogoScreen}
           initialParams={{ id:0 }}
-          options={{headerShown: false}}
+          options={{headerShown: false, animation: 'none'}}
         />
         <Stack.Screen
           name="HomeScreen"
           component={HomeScreen}
           initialParams={{ id:0 }}
-          options={{headerShown: false}}
+          options={{headerShown: false, animation: 'none'}}
         />
         <Stack.Screen
           name="MessageScreen"
           component={MessageScreen}
           initialParams={{ id:0 }}
-          options={{headerShown: false}}
+          options={{headerShown: false, animation: 'none'}}
         />
         <Stack.Screen
           name="UserScreen"
           component={UserScreen}
           initialParams={{ id:0 }}
-          options={{headerShown: false}}
+          options={{headerShown: false, animation: 'none'}}
         />
         <Stack.Screen
             name="HistoryScreen"
             component={HistoryScreen}
             initialParams={{ id:0, today:new Date().toISOString() }}
-            options={{headerShown: false, gestureEnabled: false}}
-            // options={{headerLeft: () => <></>}}
-            // headerLeft: () => null
+            options={{headerShown: false, gestureEnabled: false, animation: 'none'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

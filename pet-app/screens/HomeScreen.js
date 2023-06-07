@@ -8,7 +8,7 @@ import Constants from 'expo-constants';
 
 
 export default function HomeScreen ({route, navigation }) {
-    const [history, setHistory] = useState({ times: [], amounts: [] });
+    const [history, setHistory] = useState({ times: [], amounts: [], startTimes: [] });
     const [amount, setAmount] = useState({message: 0});
     const [today, setToday] = useState(new Date());
     const [panResponder, setPanResponder] = useState(null);
@@ -64,7 +64,7 @@ export default function HomeScreen ({route, navigation }) {
                 {history.times.map((time, index) => (
                     <View  key={index} style={styles.container4}>
                         <Text style={[styles.text, styles.text1, { textAlign: 'center' }]}>
-                            {time}{'    '}
+                            {history.startTimes[index]}-{time}{'    '}
                         </Text>
                         <Text style={[styles.text, styles.text2, { textAlign: 'center' }]}>
                             Meal {index}:    {history.amounts[index]}{'        '}
@@ -126,13 +126,14 @@ const styles = StyleSheet.create({
       textAlign: 'center',
     },
     text1: {
-        fontSize: 24,
+        fontSize: 22,
         color: 'rgb(126, 94, 240)',
     },
     text2: {
         fontSize: 20,
         color: 'rgb(101, 152, 236)',
         paddingTop: 3,
+        marginBottom: 5
     },
     text3: {
         fontSize: 20,
@@ -146,5 +147,5 @@ const styles = StyleSheet.create({
       shadowRadius: 10,
       elevation: 10,
     },
-    img: { marginTop: 7,},
+    img: { marginTop: 7, right: 15},
   });

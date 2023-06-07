@@ -1,15 +1,18 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Modal, Image, Alert } from 'react-native';
 import BottomTab from '../components/BottomTab';
 import ModalWindow from '../components/ModalWindow';
 import SettingsWindow from '../components/SettingsWindow';
+import Constants from "expo-constants";
+import axios from "axios";
 
 
 
 export default function UserScreen ({route, navigation }) {
     const [isModalVisible, setModalVisible] = useState(false);
     const [isSettingsVisible, setSettingsVisible] = useState(false);
+    const [name, setName] = useState('');
     
     const closeModal = () => {
         setModalVisible(false);
@@ -19,6 +22,23 @@ export default function UserScreen ({route, navigation }) {
         setSettingsVisible(false);
     }
 
+    const fetchData = async () => {
+        try {
+            const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
+            const url = `http://${ipAddress}:8080/getUserData?userID=${route.params.id}`;
+            const response = await axios.get(url);
+            setName(response.data.name);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+        const intervalId = setInterval(fetchData, 2000);
+        return () => clearInterval(intervalId);
+    }, []);
+
 
     return (
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
@@ -27,7 +47,7 @@ export default function UserScreen ({route, navigation }) {
 
         <View style={[styles.container, styles.container1]}>
             <Image source={require('./../img/Avatar2.png')} style={[styles.user]}/>
-            <Text style={styles.text} >Hi Ala Makota!</Text>
+            <Text style={styles.text} >Hi {name}!</Text>
         </View>
 
         <View style={[styles.container, styles.container2, styles.shadowProp]}>

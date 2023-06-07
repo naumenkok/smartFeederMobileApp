@@ -46,7 +46,7 @@ export default function MessageScreen ({route, navigation }) {
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
         {data.notifications.map((notification, index) => (
             <Animated.View key={index} style={[styles.container, styles.container1, styles.shadowProp, {opacity: opacityValues[index], transform: [{ translateX: translationValues[index] }  ] }   ]}>
-                <Text key={index} style={[styles.text, styles.text2]}>{index}{notification.context}</Text>
+                <Text key={index} style={styles.text2}>{notification.context}</Text>
                 <View style={[styles.img]}><Image source={require('./../img/Polygon.png')}/></View>
             </Animated.View>
         ))}
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         minWidth: 100,
         left: 100,
     },
-    container2:{ opacity: 1.0},
+    container2:{ opacity: 0.0},
     container3: {
         flex: 8,
         marginVertical: '5%',
@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
         color: 'blue',
         fontSize: 16,
         textAlign:'center',
+        top: 0,
         fontWeight: 'bold',
     },
     img: {

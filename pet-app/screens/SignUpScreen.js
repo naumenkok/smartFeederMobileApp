@@ -17,14 +17,14 @@ export default function  SignUp ({ navigation }) {
     };
 
     useEffect(() => {
-        const isError = !isValidEmail(email) || (name === '') || (username === '') || (password === '');
+        const isError = !isValidEmail(email) || (name === '') || (username === '') || (password === '') || (email === '');
         setHasError(isError);
     }, [email, name, username, password]);
 
     const postData = async () => {
         try {
             const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
-            await axios.post(`http://${ipAddress}:8080/registerNewUser?username=${username}&password=${password}`);
+            await axios.post(`http://${ipAddress}:8080/registerNewUser?username=${username}&password=${password}&name=${name}&email=${email}`);
             console.log(username);
             console.log(password);
         } catch (error) {
@@ -39,7 +39,7 @@ export default function  SignUp ({ navigation }) {
                             onPress={() => navigation.navigate('LogInScreen')}>
                         <Text style={styles.text3}>log in</Text>
                     </TouchableOpacity>
-                    <Text style={styles.text2}>    |</Text>
+                    <Text style={styles.text2}>     |</Text>
                     <Text style={styles.text1}>sign up</Text>
             </View>
             <View style={styles.container2}>

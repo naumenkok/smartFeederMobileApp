@@ -34,7 +34,7 @@ export default function  LogIn ({ navigation }) {
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
             <View style={styles.container1}>
                     <Text style={styles.text1}>log in</Text>
-                    <Text style={styles.text2}>|   </Text>
+                    <Text style={styles.text2}>|    </Text>
                     <TouchableOpacity 
                             onPress={() => navigation.navigate('SignUpScreen')}>
                         <Text style={styles.text3}>sign up</Text>
