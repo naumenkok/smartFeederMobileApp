@@ -39,7 +39,7 @@ const styles = (myMarginTop = '0%', isHistory = false) => StyleSheet.create({
         left: isHistory? 14:0,
         bottom: isHistory? 20:0,
         borderRadius: 22,
-        height: isHistory? '7%':'7%' ,
+        height: isHistory? '6%':'80%' ,
     },
     container1: {
         flex: isHistory? 0:10,
@@ -73,8 +73,8 @@ const styles = (myMarginTop = '0%', isHistory = false) => StyleSheet.create({
     button4: { backgroundColor: 'rgb(250, 186, 171)'},
     button0: { backgroundColor: 'rgb(252, 212, 140)'},
     buttoncenter: {
-        top: isHistory? -10:10,
-        height: '99%', width: isHistory? '12%':'20%', opacity: 1,},
+        top: isHistory? -10:18,
+        height: '95%', width: isHistory? '12%':'20%', opacity: 1,},
     buttonText1: {
         fontSize: isHistory? 14:34,
         fontWeight: 'bold',

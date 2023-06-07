@@ -34,28 +34,34 @@ const AppNavigator = () => {
         <Stack.Screen
           name="LogoScreen"
           component={LogoScreen}
+          initialParams={{ id:0 }}
           options={{headerShown: false}}
         />
         <Stack.Screen
           name="HomeScreen"
           component={HomeScreen}
+          initialParams={{ id:0 }}
           options={{headerShown: false}}
         />
         <Stack.Screen
           name="MessageScreen"
           component={MessageScreen}
+          initialParams={{ id:0 }}
           options={{headerShown: false}}
         />
         <Stack.Screen
           name="UserScreen"
           component={UserScreen}
+          initialParams={{ id:0 }}
           options={{headerShown: false}}
         />
         <Stack.Screen
             name="HistoryScreen"
             component={HistoryScreen}
-            initialParams={{ today:new Date() }}
-            options={{headerShown: false}}
+            initialParams={{ id:0, today:new Date().toISOString() }}
+            options={{headerShown: false, gestureEnabled: false}}
+            // options={{headerLeft: () => <></>}}
+            // headerLeft: () => null
         />
       </Stack.Navigator>
     </NavigationContainer>

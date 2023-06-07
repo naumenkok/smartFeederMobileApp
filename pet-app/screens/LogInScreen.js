@@ -1,11 +1,37 @@
-import React from 'react';
-import { ImageBackground, View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import InputField from '../components/InputField';
+import React, {useEffect, useState} from 'react';
+import {ImageBackground, View, StyleSheet, Text, TouchableOpacity, TextInput} from 'react-native';
+import Constants from "expo-constants";
+import axios from "axios";
 
 export default function  LogIn ({ navigation }) {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [hasError, setHasError] = useState(false);
+    const [showError, setShowError] = useState(false);
+    const [id, setId] = useState(0);
+
+    useEffect(() => {
+        const isError = (username === '') || (password === '') || (id == 0);
+        setHasError(isError);
+    }, [username, password, id]);
+
+    const getID = async () => {
+        try {
+            const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
+            const response = await axios.get(`http://${ipAddress}:8080/checkLogin`, {
+                params: {
+                    username: username,
+                    password: password
+                }
+            });
+            setId(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return(
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
-        <View style={styles.topContainer} />
             <View style={styles.container1}>
                     <Text style={styles.text1}>log in</Text>
                     <Text style={styles.text2}>|   </Text>
@@ -15,18 +41,37 @@ export default function  LogIn ({ navigation }) {
                     </TouchableOpacity>
             </View>
             <View style={styles.container2}>
-                    <InputField  label={'Enter your email ...'}
-                        keyboardType="email-address"
-                        />
+                <View style={styles.input}>
+                    <TextInput
+                    placeholder={'Enter your username ...'}
+                    onChangeText={username => {
+                        setUsername(username);
+                    }}
+                    />
+                </View>
             </View>
             <View style={styles.container3}>
-                    <InputField  label={'Enter your password ...'}
-                        inputType="password"
-                        />
+                <View style={styles.input}>
+                    <TextInput
+                        placeholder={'Enter your password ...'}
+                        secureTextEntry={true}
+                        onChangeText={password => {
+                            setPassword(password);
+                        }}
+                    />
+                </View>
             </View> 
             <View style={styles.container4}>
-                <TouchableOpacity 
-                        onPress={() => navigation.navigate('LogoScreen')}
+                {hasError && showError && <Text style={styles.text3}>Wrong input data!</Text>}
+                <TouchableOpacity
+                        onPress={() =>{
+                            setShowError(true);
+                            getID();
+                            hasError === false && id !== 0 && navigation.navigate('LogoScreen', { id:id });
+                            console.log(showError);
+                            console.log(id);
+                            console.log(hasError);
+                        }}
                         style={styles.button}>
                     <Text style={styles.buttonText1}>log in</Text>
                 </TouchableOpacity>
@@ -39,21 +84,17 @@ const styles = StyleSheet.create({
     imageBackground: {
         opacity: 0.7,
         flex: 1,
-        resizeMode: "cover",
         justifyContent: "flex-end",
     },
     topContainer: {
-        flex: 1,
     },
     container1: {
-        flex: 2,
         flexDirection: 'row',
         paddingHorizontal: 50,
         alignItems: "flex-end",
         justifyContent: 'space-between',
     },
     container2: {
-        flex: 2,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: "flex-end",
@@ -61,7 +102,6 @@ const styles = StyleSheet.create({
         paddingBottom: 0,
     },
     container3: {
-        flex: 2,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: "flex-start",
@@ -69,12 +109,23 @@ const styles = StyleSheet.create({
         paddingTop: 0,
     },
     container4: {
-        flex: 2,
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: "flex-start",
+        alignItems: "center",
         paddingHorizontal: 50,
         paddingBottom: 300,
+    },
+    input: {
+        flexDirection: 'row',
+        height: 60,
+        width: 300,
+        margin: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 5,
+        borderColor: "white",
+        borderRadius: 22,
+        backgroundColor: "white",
     },
     text1: {
         opacity: 1,
@@ -82,7 +133,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "white",
         textTransform: 'uppercase',
-        // fontFamily: 'AlBayan',
     },
     text2: {
         opacity: 1,
@@ -90,7 +140,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "white",
         textTransform: 'uppercase',
-        // fontFamily: 'AlBayan',
     },
     text3: {
         opacity: 0.75,
@@ -98,10 +147,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: "white",
         textTransform: 'uppercase',
-        paddingBottom: "2%", 
-        // fontFamily: 'AlBayan',
-        // ...styles.text1,
-        // opacity: 0.5,
+        paddingBottom: "2%",
     },
     button: {
         flexDirection: 'row',

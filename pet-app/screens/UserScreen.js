@@ -7,7 +7,7 @@ import SettingsWindow from '../components/SettingsWindow';
 
 
 
-export default function UserScreen ({ navigation }) {
+export default function UserScreen ({route, navigation }) {
     const [isModalVisible, setModalVisible] = useState(false);
     const [isSettingsVisible, setSettingsVisible] = useState(false);
     
@@ -32,7 +32,7 @@ export default function UserScreen ({ navigation }) {
 
         <View style={[styles.container, styles.container2, styles.shadowProp]}>
             <TouchableOpacity 
-                    onPress={() => navigation.navigate('HistoryScreen')}
+                    onPress={() => navigation.navigate('HistoryScreen', { id:route.params.id })}
             >
                 <Text style={[styles.text, styles.text1]} >VIEW HISTORY</Text>
             </TouchableOpacity>
@@ -48,13 +48,14 @@ export default function UserScreen ({ navigation }) {
             </TouchableOpacity>
             <Image source={require('./../img/Line1.png')} style={styles.arrow} />
             <TouchableOpacity 
-                    onPress={() => navigation.navigate('SignUpScreen')}>
+                    // onPress={() => navigation.navigate('SignUpScreen')}
+            >
                 <Text style={[styles.text, styles.text4]} >VIEW RECOMMENDATION</Text>
             </TouchableOpacity>
         </View>
 
         <View style={[styles.container, styles.container3, styles.shadowProp]}>
-            <BottomTab navigation={navigation} screenType={'UserScreen'}></BottomTab>
+            <BottomTab navigation={navigation} screenType={'UserScreen'} id={route.params.id }></BottomTab>
         </View>
     </ImageBackground>
     

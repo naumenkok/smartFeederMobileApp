@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { ImageBackground, View, StyleSheet, Text, Image } from 'react-native';
+import {ImageBackground, View, StyleSheet, Text, Image, PanResponder} from 'react-native';
 import BottomTab from '../components/BottomTab';
 import DateTab from '../components/DateTab';
 import axios from 'axios';
@@ -13,6 +13,32 @@ export default function HomeScreen ({route, navigation }) {
     const [today, setToday] = useState(new Date(route.params.today));
     const maxHeight = 450;
     const [maxAmount, setMaxAmount] = useState(1);
+    const [panResponder, setPanResponder] = useState(null);
+
+    useEffect(() => {
+        setPanResponder(
+            PanResponder.create({
+                onStartShouldSetPanResponder: () => true,
+                onPanResponderRelease: (e, gestureState) => {
+                    if (gestureState.dx > 30) {
+                        const currentDate = new Date(today.getTime());
+                        currentDate.setDate(currentDate.getDate() - 1);
+                        setToday(currentDate);
+                        console.log('dziala')
+                        //navigation.navigate('HomeScreen', { id:route.params.id , today:today.toISOString() });
+                    }
+                    if (gestureState.dx < -30) {
+                        const currentDate = new Date(today.getTime());
+                        currentDate.setDate(currentDate.getDate() + 1);
+                        setToday(currentDate);
+                        console.log('dziala')
+                        //navigation.navigate('HomeScreen', { id:route.params.id , today:today.toISOString() });
+                    }
+                },
+            })
+        );
+    },[today]);
+
     const fetchData = async () => {
         try {
             const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
@@ -47,7 +73,7 @@ export default function HomeScreen ({route, navigation }) {
     };
 
     return (
-        <ImageBackground source={require('./../img/background.jpg')} style={styles().imageBackground}>
+        <ImageBackground source={require('./../img/background.jpg')} style={styles().imageBackground} {...panResponder?.panHandlers}>
             <View style={[styles().container, styles().container2, styles().shadowProp]}>
                 <View>
                     {amounts.some((amount) => {return amount !== null && amount !== 0})? (
@@ -83,7 +109,7 @@ export default function HomeScreen ({route, navigation }) {
                 />
             </View>
             <View style={[styles().container, styles().container3, styles().shadowProp]}>
-                <BottomTab navigation={navigation} screenType={'HomeScreen'}></BottomTab>
+                <BottomTab navigation={navigation} screenType={'HomeScreen'} id={route.params.id}></BottomTab>
             </View>
         </ImageBackground>
     );

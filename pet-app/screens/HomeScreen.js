@@ -1,13 +1,13 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
-import { ImageBackground, View, StyleSheet, Text, Image, PanResponder} from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import {ImageBackground, View, StyleSheet, Text, Image, PanResponder, Animated} from 'react-native';
 import BottomTab from '../components/BottomTab';
 import DateTab from '../components/DateTab';
 import axios from 'axios';
 import Constants from 'expo-constants';
 
 
-export default function HomeScreen ({ navigation }) {
+export default function HomeScreen ({route, navigation }) {
     const [history, setHistory] = useState({ times: [], amounts: [] });
     const [amount, setAmount] = useState({message: 0});
     const [today, setToday] = useState(new Date());
@@ -20,7 +20,7 @@ export default function HomeScreen ({ navigation }) {
                 onStartShouldSetPanResponder: () => true,
                 onPanResponderRelease: (e, gestureState) => {
                     if (gestureState.dy > 50) {
-                        navigation.navigate('HistoryScreen', { today:today.toISOString() });
+                        navigation.navigate('HistoryScreen', { id:route.params.id , today:today.toISOString() });
                     }
                 },
             })
@@ -50,6 +50,7 @@ export default function HomeScreen ({ navigation }) {
         const intervalId = setInterval(fetchData, 2000);
         return () => clearInterval(intervalId);
     }, [today]);
+
 
   return (
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground} {...panResponder?.panHandlers}>
@@ -82,7 +83,7 @@ export default function HomeScreen ({ navigation }) {
                 )}
             </View>
             <View style={[styles.container, styles.container3, styles.shadowProp]}>
-                <BottomTab navigation={navigation} screenType={'HomeScreen'}></BottomTab>
+                <BottomTab navigation={navigation} screenType={'HomeScreen'} id={route.params.id }></BottomTab>
             </View>
     </ImageBackground>
   );
@@ -147,4 +148,3 @@ const styles = StyleSheet.create({
     },
     img: { marginTop: 7,},
   });
-  

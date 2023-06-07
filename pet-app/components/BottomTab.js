@@ -3,7 +3,7 @@ import {View, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import { useRef, useEffect } from 'react';
 import { Animated } from 'react-native';
 
-export default function BottomTab({navigation, screenType}) {
+export default function BottomTab({navigation, screenType, id}) {
     let imgHomeSource = require('./../img/Home.png')
     let imgMessageSource = require('./../img/Message.png')
     let imgUserSource = require('./../img/User.png')
@@ -18,7 +18,7 @@ export default function BottomTab({navigation, screenType}) {
     return (
     <View style={styles.container}>
         <TouchableOpacity
-            onPress={() => navigation.navigate('HomeScreen')}
+            onPress={() => navigation.navigate('HomeScreen', { id:id })}
             style={styles.button}>
             <Image source={imgHomeSource} style={[
                 screenType === 'HomeScreen' && { bottom: 30, left: 10, },
@@ -26,7 +26,7 @@ export default function BottomTab({navigation, screenType}) {
                 screenType === 'UserScreen' && { bottom: -10, left: 30, }]} />
         </TouchableOpacity>
         <TouchableOpacity
-            onPress={() => navigation.navigate('MessageScreen')}
+            onPress={() => navigation.navigate('MessageScreen', { id:id })}
             style={styles.button}>
             <Image source={imgMessageSource} style={[
                 screenType === 'HomeScreen' && { bottom: -12,right: 35, },
@@ -34,7 +34,7 @@ export default function BottomTab({navigation, screenType}) {
                 screenType === 'UserScreen' && { bottom: -15, left: 25,}]} />
         </TouchableOpacity>
         <TouchableOpacity
-            onPress={() => navigation.navigate('UserScreen')}
+            onPress={() => navigation.navigate('UserScreen', { id:id })}
             style={styles.button}>
             <Image source={imgUserSource} style={[
                 screenType === 'HomeScreen' && { bottom: -12,right: 35, },

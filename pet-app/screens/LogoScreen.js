@@ -2,7 +2,7 @@ import React from 'react';
 import { ImageBackground, View, StyleSheet, Text, TouchableOpacity, Button, Image, Alert } from 'react-native';
 
 
-export default function LogoScreen ({ navigation }) {
+export default function LogoScreen ({route,  navigation }) {
   return (
     <ImageBackground source={require('./../img/background.jpg')} style={styles.imageBackground}>
        
@@ -10,7 +10,7 @@ export default function LogoScreen ({ navigation }) {
                     <Text style={styles.text1}>Welcome to KarmiX</Text>
                     <Image source={require('./../img/Logo.png')} style={styles.image}/>
                     <TouchableOpacity 
-                        onPress={() => navigation.navigate('HomeScreen')}
+                        onPress={() => navigation.navigate('HomeScreen', { id:route.params.id })}
                         style={styles.button}>
                         <Text style={styles.buttonText1}>let's start</Text>
                     </TouchableOpacity>
