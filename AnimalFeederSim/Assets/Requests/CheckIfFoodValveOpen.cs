@@ -23,7 +23,6 @@ public class CheckIfFoodValveOpen : MonoBehaviour
 
             UnityWebRequest requestValves = UnityWebRequest.Get(valveStatusURL);
             yield return requestValves.SendWebRequest();
-
             if (requestValves.result == UnityWebRequest.Result.Success)
             {
                 string response = requestValves.downloadHandler.text;
@@ -53,4 +52,5 @@ public class CheckIfFoodValveOpen : MonoBehaviour
 public class ValveFoodStatusData
 {
     public bool foodOpen;
+
 }

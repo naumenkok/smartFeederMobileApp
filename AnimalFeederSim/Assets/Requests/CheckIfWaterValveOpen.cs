@@ -53,4 +53,5 @@ public class CheckIfWaterValveOpen : MonoBehaviour
 public class ValveWaterStatusData
 {
     public bool waterOpen;
+    
 }
