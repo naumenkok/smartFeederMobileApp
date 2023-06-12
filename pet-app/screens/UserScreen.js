@@ -67,11 +67,11 @@ export default function UserScreen ({route, navigation }) {
                 <Text style={[styles.text, styles.text3]} >change FOOD SETTINGS</Text>
             </TouchableOpacity>
             <Image source={require('./../img/Line1.png')} style={styles.arrow} />
-            <TouchableOpacity 
-                    // onPress={() => navigation.navigate('SignUpScreen')}
-            >
-                <Text style={[styles.text, styles.text4]} >VIEW RECOMMENDATION</Text>
-            </TouchableOpacity>
+            {/*<TouchableOpacity */}
+            {/*        // onPress={() => navigation.navigate('SignUpScreen')}*/}
+            {/*>*/}
+            {/*    <Text style={[styles.text, styles.text4]} >VIEW RECOMMENDATION</Text>*/}
+            {/*</TouchableOpacity>*/}
         </View>
 
         <View style={[styles.container, styles.container3, styles.shadowProp]}>

@@ -15,7 +15,7 @@ const Stack = createNativeStackNavigator();
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ animationEnabled: false, animationTypeForReplace: 'pop' }}>
+      <Stack.Navigator initialRouteName="MainScreen" screenOptions={{ animationEnabled: false, animationTypeForReplace: 'pop', stackPresentation: 'transparentModal'}}>
         <Stack.Screen
           name="MainScreen"
           component={MainScreen}
