@@ -20,6 +20,8 @@ public class AnimalMovement : MonoBehaviour
     private float leftFoodBound;
     private float rightFoodBound;
 
+    private float leftDoorBound;
+    private float rightDoorBound;
     private Vector3 moveDirection;
 
     // Start is called before the first frame update
@@ -28,6 +30,8 @@ public class AnimalMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         GameObject foodBowlObject = GameObject.Find("food bowl");
         GameObject waterBowlObject = GameObject.Find("water bowl");
+        GameObject DoorLeft = GameObject.Find("DoorLeft");
+        GameObject DoorRight = GameObject.Find("DoorRight");
         var foodBowlRenderer = foodBowlObject.GetComponent<Renderer>();
         var waterBowlRenderer = waterBowlObject.GetComponent<Renderer>();
         foodLevelInBowlRef = FindObjectOfType<GetFoodLevelInBowl>();
@@ -44,6 +48,9 @@ public class AnimalMovement : MonoBehaviour
         Vector3 waterBowlPosition = waterBowlObject.transform.position;
         leftWaterBound = waterBowlPosition.x - waterBowlSize.x / 2f;
         rightWaterBound = waterBowlPosition.x + waterBowlSize.x / 2f;
+
+        leftDoorBound = DoorLeft.transform.position.x;
+        rightDoorBound =  DoorRight.transform.position.x;
         animator.SetBool("isEating", false);
         animator.SetBool("isMoving", true);
 
@@ -86,12 +93,13 @@ public class AnimalMovement : MonoBehaviour
             {
                 if (hungerHandlerRef.FoodInStomachPercentage < hungerHandlerRef.WaterInStomachPercentage)
                 {
-                    float moveDirectionToBowl = (rightFoodBound - leftFoodBound > 0) ? 1 : -1;
-                    if ((moveDirectionToBowl > 0 && !facingRight) || (moveDirectionToBowl < 0 && facingRight))
+                    bool moveDirectionToBowlRight = transform.position.x < leftFoodBound;
+                    if ((moveDirectionToBowlRight && !facingRight) || (!moveDirectionToBowlRight && facingRight))
                     {
                         Flip();
                     }
-                    transform.Translate(moveDirectionToBowl * moveSpeed * Time.deltaTime, 0, 0);
+                    float moveDirection = facingRight ? 1 : -1;
+                    transform.Translate(moveDirection * moveSpeed * Time.deltaTime, 0, 0);
                     if (transform.position.x >= leftFoodBound && transform.position.x <= rightFoodBound)
                     {
                         if (!isEating)
@@ -102,12 +110,13 @@ public class AnimalMovement : MonoBehaviour
                 }
                 else
                 {
-                    float moveDirectionToBowl = (rightWaterBound - leftWaterBound > 0) ? 1 : -1;
-                    if ((moveDirectionToBowl > 0 && !facingRight) || (moveDirectionToBowl < 0 && facingRight))
+                    bool moveDirectionToBowlRight = transform.position.x < leftWaterBound;
+                    if ((moveDirectionToBowlRight && !facingRight) || (!moveDirectionToBowlRight && facingRight))
                     {
                         Flip();
                     }
-                    transform.Translate(moveDirectionToBowl * moveSpeed * Time.deltaTime, 0, 0);
+                    float moveDirection = facingRight ? 1 : -1;
+                    transform.Translate(moveDirection * moveSpeed * Time.deltaTime, 0, 0);
                     if (transform.position.x >= leftWaterBound && transform.position.x <= rightWaterBound)
                     {
                         if (!isEating)

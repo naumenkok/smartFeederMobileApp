@@ -31,7 +31,15 @@ public class HungerHandler : MonoBehaviour
 
             FoodInStomachPercentage -= FoodDeclineRate;
             WaterInStomachPercentage -= WaterDeclineRate;
+            if (FoodInStomachPercentage < 0)
+            {
+                FoodInStomachPercentage = 0;
+            }
 
+            if (WaterInStomachPercentage < 0)
+            {
+                WaterInStomachPercentage = 0;
+            }
             ThirstLevelText.text = "Thirst Level: " + WaterInStomachPercentage.ToString("F1") + "%";
             HungerLevelText.text = "Hunger Level: " + FoodInStomachPercentage.ToString("F1") + "%";
         }

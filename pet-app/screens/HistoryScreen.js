@@ -24,15 +24,11 @@ export default function HomeScreen ({route, navigation }) {
                         const currentDate = new Date(today.getTime());
                         currentDate.setDate(currentDate.getDate() - 1);
                         setToday(currentDate);
-                        console.log('dziala')
-                        //navigation.navigate('HomeScreen', { id:route.params.id , today:today.toISOString() });
                     }
                     if (gestureState.dx < -30) {
                         const currentDate = new Date(today.getTime());
                         currentDate.setDate(currentDate.getDate() + 1);
                         setToday(currentDate);
-                        console.log('dziala')
-                        //navigation.navigate('HomeScreen', { id:route.params.id , today:today.toISOString() });
                     }
                 },
             })

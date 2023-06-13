@@ -15,6 +15,7 @@ import {
 import Constants from 'expo-constants';
 
 export default function ModalWindow({ visible, onClose }) {
+    const [data, setData] = useState('');
     const [times, setTimes] = useState(Array(5).fill(''));
     const [amounts, setAmounts] = useState(Array(5).fill(''));
     const [hasError, setHasError] = useState(false);
@@ -30,7 +31,7 @@ export default function ModalWindow({ visible, onClose }) {
     }, [times, amounts]);
 
     const postData = async () => {
-      try {z
+      try {
         const ipAddress = Constants.manifest.debuggerHost.split(':').shift();
         const response = await axios.post(`http://${ipAddress}:8080/postNewDiet`,  {
             times: times,

@@ -11,7 +11,7 @@ export default function  LogIn ({ navigation }) {
     const [id, setId] = useState(0);
 
     useEffect(() => {
-        const isError = (username === '') || (password === '') || (id == 0);
+        const isError = (username === '') || (password === '') || (id === 0);
         setHasError(isError);
     }, [username, password, id]);
 
